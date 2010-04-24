@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-package com.antiaction.raptor.frontend;
+package com.antiaction.raptor.template;
 
 public class TemplatePlaceHolder extends TemplatePlace {
 
@@ -13,7 +13,11 @@ public class TemplatePlaceHolder extends TemplatePlace {
 	}
 
 	public static TemplatePlaceHolder getInstance(String idName) {
-		return null;
+		TemplatePlaceHolder place = new TemplatePlaceHolder();
+		place.type = TemplatePlace.PH_PLACEHOLDER;
+		place.tagName = "placeholder";
+		place.idName = idName;
+		return place;
 	}
 
 }
