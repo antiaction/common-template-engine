@@ -7,6 +7,7 @@
 
 package com.antiaction.raptor.template;
 
+import java.util.Map;
 
 public class TemplatePlaceTag extends TemplatePlace {
 
@@ -19,6 +20,38 @@ public class TemplatePlaceTag extends TemplatePlace {
 		place.tagName = tagName;
 		place.idName = idName;
 		return place;
+	}
+
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = null;
+		if ( htmlItem != null ) {
+			attributes = htmlItem.getAttributes();
+		}
+		return attributes;
+	}
+
+	public String getAttribute(String name) {
+		String value = null;
+		if ( htmlItem != null ) {
+			value = htmlItem.getAttribute( name );
+		}
+		return value;
+	}
+
+	public Object setAttribute(String name, String value) {
+		Object old = null;
+		if ( htmlItem != null ) {
+			old = htmlItem.setAttribute( name, value );
+		}
+		return old;
+	}
+
+	public Object removeAttribute(String name) {
+		Object old = null;
+		if ( htmlItem != null ) {
+			old = htmlItem.removeAttribute( name );
+		}
+		return old;
 	}
 
 }

@@ -15,6 +15,8 @@ public abstract class TemplatePlace {
 
 	public static final int PH_PLACEHOLDER = 2;
 
+	public TemplatePart templatePart = null;
+
 	public HTMLItem htmlItem = null;
 
 	public int type = 0;
@@ -23,7 +25,7 @@ public abstract class TemplatePlace {
 
 	public String idName = null;
 
-	public static TemplatePlaceTag getTemplateTagPlace(String tagName, String idName) {
+	public static TemplatePlaceTag getTemplatePlaceTag(String tagName, String idName) {
 		return TemplatePlaceTag.getInstance( tagName, idName );
 	}
 

@@ -8,7 +8,9 @@
 package com.antiaction.raptor.template;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +29,10 @@ public class TemplateMaster {
 	private File templatePath = null;
 
 	/** Map of cached <code>Template</code> instances. */
-	private Map<String, Template> templates = new HashMap<String, Template>();
+	private Map<String, Template> templateMap = new HashMap<String, Template>();
+
+	/** List of cached <code>Template</code> instances. */
+	private List<Template> templateList = new ArrayList<Template>();
 
 	/*
 	 * Prevent creation of identical instances.
@@ -51,18 +56,31 @@ public class TemplateMaster {
 	}
 
 	/**
-	 * 
-	 * @param templateFileStr
-	 * @return
+	 * Given a template filename with relative path returns a template interaction object.
+	 * @param templateFileStr template filename with relative path.
+	 * @return prepared template interaction object.
 	 */
 	public Template getTemplate(String templateFileStr) {
 		File templateFile = new File( templatePath, templateFileStr );
 		Template template = null;
-		synchronized ( templates ) {
-			template = templates.get( templateFileStr );
-			if ( template == null ) {
-				template = Template.getInstance( templateFile );
-				templates.put( templateFileStr, template );
+		synchronized ( templateMap ) {
+			template = templateMap.get( templateFileStr );
+			if ( template != null ) {
+				if ( templateFile.exists() && templateFile.isFile() ) {
+					if ( template.last_modified != templateFile.lastModified() || template.last_file_length != templateFile.length() ) {
+						template.reload();
+					}
+				}
+				else {
+					template = null;
+				}
+			}
+			else {
+				template = Template.getInstance( templateFileStr, templateFile );
+				if ( template != null ) {
+					templateMap.put( templateFileStr, template );
+					templateList.add( template );
+				}
 			}
 		}
 		return template;

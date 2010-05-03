@@ -20,4 +20,10 @@ public class TemplatePlaceHolder extends TemplatePlace {
 		return place;
 	}
 
+	public void setText(String text) {
+		if ( templatePart != null ) {
+			((TemplatePartPlaceHolder)templatePart).text = text.getBytes();
+		}
+	}
+
 }

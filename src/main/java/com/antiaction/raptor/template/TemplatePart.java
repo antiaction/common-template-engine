@@ -11,14 +11,24 @@ import com.antiaction.common.html.HTMLItem;
 
 public abstract class TemplatePart {
 
+	public HTMLItem htmlItem = null;
+
 	public abstract byte[] getBytes();
 
 	public static TemplatePartStatic getTemplatePartStatic(byte[] text) {
 		return TemplatePartStatic.getInstance( text );
 	}
 
-	public static TemplatePartTag getTemplatePartTag(HTMLItem htmlItem, TemplatePlace templatePlace) {
-		return TemplatePartTag.getInstance( htmlItem, templatePlace );
+	public static TemplatePartI18N getTemplatePartI18N(HTMLItem htmlItem) {
+		return TemplatePartI18N.getInstance( htmlItem );
+	}
+
+	public static TemplatePartPlaceHolder getTemplatePartPlaceHolder(HTMLItem htmlItem) {
+		return TemplatePartPlaceHolder.getInstance( htmlItem );
+	}
+
+	public static TemplatePartTag getTemplatePartTag(HTMLItem htmlItem) {
+		return TemplatePartTag.getInstance( htmlItem );
 	}
 
 }

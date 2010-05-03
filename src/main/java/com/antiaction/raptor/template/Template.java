@@ -21,28 +21,70 @@ import com.antiaction.common.html.HTMLParser;
 
 public class Template {
 
+	/** Cached template path+file name. */
+	public String templateFileStr = null;
+
+	/** Cached template <code>File</code> object. */
+	public File templateFile = null;
+
+	/** Cached template modified date. */
+	public long last_modified = -1;
+
+	/** Cached template file length. */
+	public long last_file_length = -1;
+
+	/** Cached template raw bytes. */
 	public byte[] raw_html = null;
 
+	/** Cached template split into separate html/xml elements. */
 	public List<HTMLItem> html_items = null;
 
+	/**
+	 * Disable public constructor.
+	 */
 	private Template() {
 	}
 
-	public static Template getInstance(File templateFile) {
-		Template t = new Template();
+	/**
+	 * Initialize a template file by loading, parsing and splitting it into sub-parts.
+	 * @param templateFileStr template path+file name.
+	 * @param templateFile template file-system <code>File</code> object.
+	 * @return a parsed and split template file.
+	 */
+	public static Template getInstance(String templateFileStr, File templateFile) {
+		Template template = new Template();
+		template.templateFileStr = templateFileStr;
+		template.templateFile = templateFile;
+		template.reload();
+		return template;
+	}
 
+	/**
+	 * Load or reload a template file parsing and splitting it into sub-parts.
+	 * TODO detect character encoding before turning into String internally.
+	 */
+	public void reload() {
 		RandomAccessFile ram;
 		try {
-			ram = new RandomAccessFile( templateFile, "r" );
-			t.raw_html = new byte[ (int)ram.length() ];
-			ram.readFully( t.raw_html );
+			if ( templateFile.exists() && templateFile.isFile() ) {
+				last_modified = templateFile.lastModified();
+				last_file_length = templateFile.length();
 
-			ByteArrayInputStream is = new ByteArrayInputStream( t.raw_html );
+				ram = new RandomAccessFile( templateFile, "r" );
+				raw_html = new byte[ (int)ram.length() ];
+				ram.readFully( raw_html );
+				ram.close();
 
-			HTMLParser htmlParser = new HTMLParser();
-			t.html_items = htmlParser.parse( is );
+				// debug
+				System.out.println( "Template-loading: " + templateFile.getCanonicalFile() );
 
-			is.close();
+				ByteArrayInputStream is = new ByteArrayInputStream( raw_html );
+
+				HTMLParser htmlParser = new HTMLParser();
+				html_items = htmlParser.parse( is );
+
+				is.close();
+			}
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -50,8 +92,6 @@ public class Template {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return t;
 	}
 
 	// Check for valid character encoding and cache per encoding.
@@ -61,6 +101,7 @@ public class Template {
 		String tagName;
 		String id;
 		String name;
+		String text_id;
 
 		Boolean b;
 		Boolean f;
@@ -70,6 +111,7 @@ public class Template {
 
 		HTMLItem htmlItem;
 		TemplatePlace templatePlace;
+		TemplatePart templatePart;
 
 		if ( html_items != null ) {
 			int i = 0;
@@ -82,8 +124,24 @@ public class Template {
 					name = htmlItem.getAttribute( "name" );
 
 					templatePlace = null;
+					templatePart = null;
 					f = false;
 
+					if ( "i18n".compareTo( tagName ) == 0 ) {
+						text_id = htmlItem.getAttribute( "text_id" );
+						if ( text_id != null && text_id.length() > 0 ) {
+							templatePart = TemplatePart.getTemplatePartI18N( (HTMLItem)htmlItem.clone() );
+							templateParts.i18nList.add( (TemplatePartI18N)templatePart );
+						}
+						f = true;
+					}
+					else if ( "placeholder".compareTo( tagName) == 0 ) {
+						if ( id != null && id.length() > 0 ) {
+							templatePart = TemplatePart.getTemplatePartPlaceHolder( (HTMLItem)htmlItem.clone() );
+							templateParts.placeHoldersMap.put( id, (TemplatePartPlaceHolder)templatePart );
+						}
+						f = true;
+					}
 					if ( id != null || name != null ) {
 						int j = 0;
 						b = true;
@@ -94,12 +152,23 @@ public class Template {
 								case TemplatePlace.PH_TAG:
 									if ( templatePlace.tagName.compareTo( tagName ) == 0 ) {
 										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
+											templatePart = TemplatePart.getTemplatePartTag( (HTMLItem)htmlItem.clone() );
+											templatePlace.templatePart = templatePart;
+											templatePlace.htmlItem = templatePart.htmlItem;
 											b = false;
 											f = true;
 										}
 									}
 									break;
 								case TemplatePlace.PH_PLACEHOLDER:
+									if ( "placeholder".compareTo( tagName) == 0 ) {
+										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
+											templatePlace.templatePart = templatePart;
+											templatePlace.htmlItem = templatePart.htmlItem;
+											b = false;
+											f = true;
+										}
+									}
 									break;
 								}
 							}
@@ -114,7 +183,9 @@ public class Template {
 							templateParts.parts.add( TemplatePart.getTemplatePartStatic( out.toByteArray() ) );
 							out.reset();
 						}
-						templateParts.parts.add( TemplatePart.getTemplatePartTag( (HTMLItem)htmlItem.clone(), templatePlace ) );
+						if ( templatePart != null ) {
+							templateParts.parts.add( templatePart );
+						}
 					}
 					else {
 						out.write( htmlItem.getText().getBytes( character_encoding ) );

@@ -14,18 +14,12 @@ import com.antiaction.common.html.HTMLItem;
 
 public class TemplatePartTag extends TemplatePart {
 
-	public HTMLItem htmlItem = null;
-
-	public TemplatePlace templatePlace = null;
-
 	private TemplatePartTag() {
 	}
 
-	public static TemplatePartTag getInstance(HTMLItem htmlItem, TemplatePlace templatePlace) {
-		templatePlace.htmlItem = htmlItem;
+	public static TemplatePartTag getInstance(HTMLItem htmlItem) {
 		TemplatePartTag part = new TemplatePartTag();
 		part.htmlItem = htmlItem;
-		part.templatePlace = templatePlace;
 		return part;
 	}
 
