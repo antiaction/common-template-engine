@@ -25,12 +25,12 @@ public abstract class TemplatePlace {
 
 	public String idName = null;
 
-	public static TemplatePlaceTag getTemplatePlaceTag(String tagName, String idName) {
-		return TemplatePlaceTag.getInstance( tagName, idName );
-	}
-
 	public static TemplatePlaceHolder getTemplatePlaceHolder(String idName) {
 		return TemplatePlaceHolder.getInstance( idName );
+	}
+
+	public static TemplatePlaceTag getTemplatePlaceTag(String tagName, String idName) {
+		return TemplatePlaceTag.getInstance( tagName, idName );
 	}
 
 }

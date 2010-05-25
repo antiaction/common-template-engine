@@ -38,18 +38,18 @@ public class TemplatePlaceTag extends TemplatePlace {
 		return value;
 	}
 
-	public Object setAttribute(String name, String value) {
-		Object old = null;
+	public String setAttribute(String name, String value) {
+		String old = null;
 		if ( htmlItem != null ) {
-			old = htmlItem.setAttribute( name, value );
+			old = (String)htmlItem.setAttribute( name, value );
 		}
 		return old;
 	}
 
-	public Object removeAttribute(String name) {
-		Object old = null;
+	public String removeAttribute(String name) {
+		String old = null;
 		if ( htmlItem != null ) {
-			old = htmlItem.removeAttribute( name );
+			old = (String)htmlItem.removeAttribute( name );
 		}
 		return old;
 	}
