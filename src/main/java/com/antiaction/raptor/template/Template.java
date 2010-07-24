@@ -80,8 +80,12 @@ public class Template {
 
 				ByteArrayInputStream is = new ByteArrayInputStream( raw_html );
 
+				// Parse html into a List of html items.
 				HTMLParser htmlParser = new HTMLParser();
 				html_items = htmlParser.parse( is );
+
+				// Validate html. 
+				HtmlValidator.validate( html_items );
 
 				is.close();
 			}
