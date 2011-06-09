@@ -12,12 +12,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.antiaction.common.html.HTMLItem;
 import com.antiaction.common.html.HTMLParser;
+import com.antiaction.common.html.HtmlReaderInput;
 
 public class Template {
 
@@ -34,7 +36,7 @@ public class Template {
 	public long last_file_length = -1;
 
 	/** Cached template raw bytes. */
-	public byte[] raw_html = null;
+	public byte[] html_raw_bytes = null;
 
 	/** Cached template split into separate html/xml elements. */
 	public List<HTMLItem> html_items = null;
@@ -71,22 +73,24 @@ public class Template {
 				last_file_length = templateFile.length();
 
 				ram = new RandomAccessFile( templateFile, "r" );
-				raw_html = new byte[ (int)ram.length() ];
-				ram.readFully( raw_html );
+				html_raw_bytes = new byte[ (int)ram.length() ];
+				ram.readFully( html_raw_bytes );
 				ram.close();
 
 				// debug
 				System.out.println( "Template-loading: " + templateFile.getCanonicalFile() );
 
-				ByteArrayInputStream is = new ByteArrayInputStream( raw_html );
+				ByteArrayInputStream is = new ByteArrayInputStream( html_raw_bytes );
+				InputStreamReader reader = new InputStreamReader( is, "utf-8" );
 
 				// Parse html into a List of html items.
 				HTMLParser htmlParser = new HTMLParser();
-				html_items = htmlParser.parse( is );
+				html_items = htmlParser.parse( HtmlReaderInput.getInstance( reader ) );
 
 				// Validate html. 
 				HtmlValidator.validate( html_items );
 
+				reader.close();
 				is.close();
 			}
 		}

@@ -7,6 +7,7 @@
 
 package com.antiaction.raptor.template;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,7 +25,17 @@ public class TemplatePartTag extends TemplatePart {
 	}
 
 	@Override
-	public byte[] getBytes() {
+	public void setText(String text) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getText() {
 		//return htmlItem.getText().getBytes();
 		StringBuffer sb = new StringBuffer();
 		sb.append( '<' );
@@ -48,7 +59,19 @@ public class TemplatePartTag extends TemplatePart {
 			sb.append( " /" );
 		}
 		sb.append( '>' );
-		return sb.toString().getBytes();
+		return sb.toString();
+	}
+
+	@Override
+	public byte[] getBytes() {
+		byte[] bytes = new byte[ 0 ];
+		try {
+			bytes = getText().getBytes( "utf-8" );
+		}
+		catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return bytes;
 	}
 
 }

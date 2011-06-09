@@ -13,10 +13,20 @@ public abstract class TemplatePart {
 
 	public HTMLItem htmlItem = null;
 
+	public abstract void setText(String text);
+
+	public abstract void setBytes(byte[] bytes);
+
+	public abstract String getText();
+
 	public abstract byte[] getBytes();
 
-	public static TemplatePartStatic getTemplatePartStatic(byte[] text) {
+	public static TemplatePartStatic getTemplatePartStatic(String text) {
 		return TemplatePartStatic.getInstance( text );
+	}
+
+	public static TemplatePartStatic getTemplatePartStatic(byte[] bytes) {
+		return TemplatePartStatic.getInstance( bytes );
 	}
 
 	public static TemplatePartI18N getTemplatePartI18N(HTMLItem htmlItem) {

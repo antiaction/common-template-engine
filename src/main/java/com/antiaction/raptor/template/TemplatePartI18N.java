@@ -7,13 +7,17 @@
 
 package com.antiaction.raptor.template;
 
+import java.io.UnsupportedEncodingException;
+
 import com.antiaction.common.html.HTMLItem;
 
 public class TemplatePartI18N extends TemplatePart {
 
-	public String text_id = "";
+	private String text_id = "";
 
-	public byte[] text = "".getBytes();
+	private String text = "";
+
+	private byte[] bytes = "".getBytes();
 
 	private TemplatePartI18N() {
 	}
@@ -23,14 +27,36 @@ public class TemplatePartI18N extends TemplatePart {
 		part.htmlItem = htmlItem;
 		part.text_id = htmlItem.getAttribute( "text_id" );
 		if ( part.text_id != null ) {
-			part.text = part.text_id.getBytes();
+			// TODO language translation
+			part.text = part.text_id;
+			try {
+				part.bytes = part.text.getBytes( "utf-8" );
+			}
+			catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return part;
 	}
 
 	@Override
-	public byte[] getBytes() {
+	public void setText(String text) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getText() {
 		return text;
+	}
+
+	@Override
+	public byte[] getBytes() {
+		return bytes;
 	}
 
 }

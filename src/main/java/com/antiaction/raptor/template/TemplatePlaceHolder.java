@@ -29,7 +29,7 @@ public class TemplatePlaceHolder extends TemplatePlace {
 
 	public void setText(String text) {
 		if ( templatePart != null ) {
-			((TemplatePartPlaceHolder)templatePart).text = text.getBytes();
+			((TemplatePartPlaceHolder)templatePart).setText( text );
 		}
 
 		try {
