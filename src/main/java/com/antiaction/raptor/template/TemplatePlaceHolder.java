@@ -11,17 +11,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.antiaction.common.html.HTMLItem;
-import com.antiaction.common.html.HTMLParser;
+import com.antiaction.common.html.HtmlItem;
+import com.antiaction.common.html.HtmlParser;
 
-public class TemplatePlaceHolder extends TemplatePlace {
+public class TemplatePlaceHolder extends TemplatePlaceBase {
 
 	private TemplatePlaceHolder() {
 	}
 
 	public static TemplatePlaceHolder getInstance(String idName) {
 		TemplatePlaceHolder place = new TemplatePlaceHolder();
-		place.type = TemplatePlace.PH_PLACEHOLDER;
+		place.type = TemplatePlaceBase.PH_PLACEHOLDER;
 		place.tagName = "placeholder";
 		place.idName = idName;
 		return place;
@@ -36,8 +36,8 @@ public class TemplatePlaceHolder extends TemplatePlace {
 			ByteArrayInputStream is = new ByteArrayInputStream( text.getBytes() );
 
 			// Parse html into a List of html items.
-			HTMLParser htmlParser = new HTMLParser();
-			List<HTMLItem> html_items = htmlParser.parse( is );
+			HtmlParser htmlParser = new HtmlParser();
+			List<HtmlItem> html_items = htmlParser.parse( is );
 
 			// Validate html. 
 			HtmlValidator.validate( html_items );

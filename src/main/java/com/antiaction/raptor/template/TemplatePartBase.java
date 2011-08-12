@@ -7,11 +7,11 @@
 
 package com.antiaction.raptor.template;
 
-import com.antiaction.common.html.HTMLItem;
+import com.antiaction.common.html.HtmlItem;
 
-public abstract class TemplatePart {
+public abstract class TemplatePartBase {
 
-	public HTMLItem htmlItem = null;
+	public HtmlItem htmlItem = null;
 
 	public abstract void setText(String text);
 
@@ -29,15 +29,15 @@ public abstract class TemplatePart {
 		return TemplatePartStatic.getInstance( bytes );
 	}
 
-	public static TemplatePartI18N getTemplatePartI18N(HTMLItem htmlItem) {
+	public static TemplatePartI18N getTemplatePartI18N(HtmlItem htmlItem) {
 		return TemplatePartI18N.getInstance( htmlItem );
 	}
 
-	public static TemplatePartPlaceHolder getTemplatePartPlaceHolder(HTMLItem htmlItem) {
+	public static TemplatePartPlaceHolder getTemplatePartPlaceHolder(HtmlItem htmlItem) {
 		return TemplatePartPlaceHolder.getInstance( htmlItem );
 	}
 
-	public static TemplatePartTag getTemplatePartTag(HTMLItem htmlItem) {
+	public static TemplatePartTag getTemplatePartTag(HtmlItem htmlItem) {
 		return TemplatePartTag.getInstance( htmlItem );
 	}
 

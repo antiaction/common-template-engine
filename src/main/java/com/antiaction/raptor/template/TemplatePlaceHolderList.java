@@ -12,16 +12,16 @@ import java.util.List;
 
 public class TemplatePlaceHolderList {
 
-	public List<TemplatePlace> placeHolders = new ArrayList<TemplatePlace>();
+	public List<TemplatePlaceBase> placeHolders = new ArrayList<TemplatePlaceBase>();
 
 	public TemplatePlaceHolder addTemplatePlaceHolder(String idName) {
-		TemplatePlaceHolder placeHolder = TemplatePlace.getTemplatePlaceHolder( idName );
+		TemplatePlaceHolder placeHolder = TemplatePlaceBase.getTemplatePlaceHolder( idName );
 		placeHolders.add( placeHolder );
 		return placeHolder;
 	}
 
 	public TemplatePlaceTag addTemplatePlaceTag(String tagName, String idName) {
-		TemplatePlaceTag placeHolder = TemplatePlace.getTemplatePlaceTag( "title", null );
+		TemplatePlaceTag placeHolder = TemplatePlaceBase.getTemplatePlaceTag( "title", null );
 		placeHolders.add( placeHolder );
 		return placeHolder;
 	}

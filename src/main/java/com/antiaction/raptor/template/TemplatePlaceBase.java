@@ -7,17 +7,17 @@
 
 package com.antiaction.raptor.template;
 
-import com.antiaction.common.html.HTMLItem;
+import com.antiaction.common.html.HtmlItem;
 
-public abstract class TemplatePlace {
+public abstract class TemplatePlaceBase {
 
 	public static final int PH_TAG = 1;
 
 	public static final int PH_PLACEHOLDER = 2;
 
-	public TemplatePart templatePart = null;
+	public TemplatePartBase templatePart = null;
 
-	public HTMLItem htmlItem = null;
+	public HtmlItem htmlItem = null;
 
 	public int type = 0;
 

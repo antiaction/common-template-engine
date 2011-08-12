@@ -9,14 +9,14 @@ package com.antiaction.raptor.template;
 
 import java.util.Map;
 
-public class TemplatePlaceTag extends TemplatePlace {
+public class TemplatePlaceTag extends TemplatePlaceBase {
 
 	private TemplatePlaceTag() {
 	}
 
 	public static TemplatePlaceTag getInstance(String tagName, String idName) {
 		TemplatePlaceTag place = new TemplatePlaceTag();
-		place.type = TemplatePlace.PH_TAG;
+		place.type = TemplatePlaceBase.PH_TAG;
 		place.tagName = tagName;
 		place.idName = idName;
 		return place;

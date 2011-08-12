@@ -11,14 +11,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.antiaction.common.html.HTMLItem;
+import com.antiaction.common.html.HtmlItem;
 
-public class TemplatePartTag extends TemplatePart {
+public class TemplatePartTag extends TemplatePartBase {
 
 	private TemplatePartTag() {
 	}
 
-	public static TemplatePartTag getInstance(HTMLItem htmlItem) {
+	public static TemplatePartTag getInstance(HtmlItem htmlItem) {
 		TemplatePartTag part = new TemplatePartTag();
 		part.htmlItem = htmlItem;
 		return part;

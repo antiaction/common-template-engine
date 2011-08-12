@@ -76,7 +76,7 @@ public class TemplateMaster {
 				}
 			}
 			else {
-				template = Template.getInstance( templateFileStr, templateFile );
+				template = Template.getInstance( this, templateFileStr, templateFile );
 				if ( template != null ) {
 					templateMap.put( templateFileStr, template );
 					templateList.add( template );

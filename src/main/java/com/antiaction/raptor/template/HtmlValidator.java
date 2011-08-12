@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.antiaction.common.html.HTMLItem;
+import com.antiaction.common.html.HtmlItem;
 
 public class HtmlValidator {
 
@@ -25,18 +25,18 @@ public class HtmlValidator {
 		noselfchild.add( "input" );
 	}
 
-	public static void validate(List<HTMLItem> html_items) {
+	public static void validate(List<HtmlItem> html_items) {
 		if ( html_items == null || html_items.size() == 0 ) {
 			return;
 		}
 
 		int state = 0;
 
-		HTMLItem htmlItem;
+		HtmlItem htmlItem;
 		int type;
-		HTMLItem stackItem;
+		HtmlItem stackItem;
 
-		List<HTMLItem> stack = new ArrayList<HTMLItem>();
+		List<HtmlItem> stack = new ArrayList<HtmlItem>();
 
 		boolean b = true;
 		boolean s;
@@ -47,14 +47,14 @@ public class HtmlValidator {
 				type = htmlItem.getType();
 				switch ( state ) {
 				case 0:
-					if ( type == HTMLItem.T_PROCESSING ) {
+					if ( type == HtmlItem.T_PROCESSING ) {
 						// debug
 						//System.out.println( "0: " + htmlItem.getText() );
 
 						++idx;
 						state = 1;
 					}
-					else if ( type == HTMLItem.T_EXCLAMATION ) {
+					else if ( type == HtmlItem.T_EXCLAMATION ) {
 						// debug
 						//System.out.println( "1: " + htmlItem.getText() );
 
@@ -66,7 +66,7 @@ public class HtmlValidator {
 					}
 					break;
 				case 1:
-					if ( type == HTMLItem.T_EXCLAMATION ) {
+					if ( type == HtmlItem.T_EXCLAMATION ) {
 						// debug
 						System.out.println( "1: " + htmlItem.getText() );
 
@@ -79,7 +79,7 @@ public class HtmlValidator {
 					break;
 				case 2:
 					switch ( type ) {
-					case HTMLItem.T_TAG:
+					case HtmlItem.T_TAG:
 						if ( !htmlItem.getClosed() ) {
 							if ( stack.size() > 0 ) {
 								if ( noselfchild.contains( htmlItem.getTagname().toLowerCase() ) ) {
@@ -92,7 +92,7 @@ public class HtmlValidator {
 							stack.add( htmlItem );
 						}
 						break;
-					case HTMLItem.T_ENDTAG:
+					case HtmlItem.T_ENDTAG:
 						s = true;
 						while ( s ) {
 							if ( stack.size() > 0 ) {
@@ -117,10 +117,10 @@ public class HtmlValidator {
 							}
 						}
 						break;
-					case HTMLItem.T_TEXT:
-					case HTMLItem.T_PROCESSING:
-					case HTMLItem.T_EXCLAMATION:
-					case HTMLItem.T_COMMENT:
+					case HtmlItem.T_TEXT:
+					case HtmlItem.T_PROCESSING:
+					case HtmlItem.T_EXCLAMATION:
+					case HtmlItem.T_COMMENT:
 					default:
 						break;
 					}

@@ -9,7 +9,7 @@ package com.antiaction.raptor.template;
 
 import java.io.UnsupportedEncodingException;
 
-public class TemplatePartStatic extends TemplatePart {
+public class TemplatePartStatic extends TemplatePartBase {
 
 	private String text = "";
 

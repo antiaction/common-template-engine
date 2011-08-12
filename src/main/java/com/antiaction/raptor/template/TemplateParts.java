@@ -18,6 +18,6 @@ public class TemplateParts {
 
 	public List<TemplatePartI18N> i18nList = new ArrayList<TemplatePartI18N>();
 
-	public List<TemplatePart> parts = new ArrayList<TemplatePart>();
+	public List<TemplatePartBase> parts = new ArrayList<TemplatePartBase>();
 
 }

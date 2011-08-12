@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.antiaction.common.html.HTMLEntity;
+import com.antiaction.common.html.HtmlEntity;
 import com.antiaction.raptor.frontend.Caching;
 
 public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
@@ -25,6 +25,8 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 	public TemplateMaster templateMaster = null;
 
 	public String templateName = null;
+
+	public String adminPath = "/admin/";
 
 	public void logoff(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws IOException {
 		Cookie rememberCookie;
@@ -39,7 +41,7 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 		rememberCookie.setMaxAge( 0 );
 		resp.addCookie( rememberCookie );
 
-		resp.sendRedirect( "/admin/" );
+		resp.sendRedirect( adminPath );
 	}
 
 	public UserType loginFromCookie(HttpServletRequest req, HttpServletResponse resp, HttpSession session, LoginTemplateCallback<UserType> callback) {
@@ -137,13 +139,13 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 			//System.out.println( template );
 
 			if ( template != null ) {
-				TemplatePlaceHolder errorPlace = TemplatePlace.getTemplatePlaceHolder( "errorPlace" );
-				TemplatePlaceTag loginUser = TemplatePlace.getTemplatePlaceTag( "input", "login_user" );
+				TemplatePlaceHolder errorPlace = TemplatePlaceBase.getTemplatePlaceHolder( "errorPlace" );
+				TemplatePlaceTag loginUser = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_user" );
 				//TemplateTagPlace loginPass = TemplatePlace.getTemplateTagPlace( "input", "login_pass" );
-				TemplatePlaceTag loginRemember = TemplatePlace.getTemplatePlaceTag( "input", "login_rememberme" );
-				TemplatePlaceTag loginToUrl = TemplatePlace.getTemplatePlaceTag( "input", "login_tourl" );
+				TemplatePlaceTag loginRemember = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_rememberme" );
+				TemplatePlaceTag loginToUrl = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_tourl" );
 
-				List<TemplatePlace> placeHolders = new ArrayList<TemplatePlace>();
+				List<TemplatePlaceBase> placeHolders = new ArrayList<TemplatePlaceBase>();
 				placeHolders.add( errorPlace );
 				placeHolders.add( loginUser );
 				placeHolders.add( loginRemember );
@@ -159,7 +161,7 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 				}
 
 				if ( user != null ) {
-					loginUser.setAttribute( "value", HTMLEntity.encodeHtmlEntities( user ).toString() );
+					loginUser.setAttribute( "value", HtmlEntity.encodeHtmlEntities( user ).toString() );
 				}
 
 				if ( rememberMe != null ) {
@@ -167,7 +169,7 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 				}
 
 				if ( toUrl != null ) {
-					loginToUrl.setAttribute( "value", HTMLEntity.encodeHtmlEntities( toUrl ).toString() );
+					loginToUrl.setAttribute( "value", HtmlEntity.encodeHtmlEntities( toUrl ).toString() );
 				}
 				else {
 					String pathInfo = req.getPathInfo();
@@ -180,7 +182,7 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 						if ( qs != null && qs.length() > 0 ) {
 							url += "?" + qs;
 						}
-						loginToUrl.setAttribute( "value", HTMLEntity.encodeHtmlEntities( url ).toString() );
+						loginToUrl.setAttribute( "value", HtmlEntity.encodeHtmlEntities( url ).toString() );
 					}
 				}
 
@@ -209,7 +211,7 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 				resp.sendRedirect( toUrl );
 			}
 			else {
-				resp.sendRedirect( "/admin/" );
+				resp.sendRedirect( adminPath );
 			}
 		}
 	}

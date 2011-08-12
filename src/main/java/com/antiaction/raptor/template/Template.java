@@ -17,11 +17,14 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import com.antiaction.common.html.HTMLItem;
-import com.antiaction.common.html.HTMLParser;
+import com.antiaction.common.html.HtmlItem;
+import com.antiaction.common.html.HtmlParser;
 import com.antiaction.common.html.HtmlReaderInput;
 
 public class Template {
+
+	/** Template Master. */
+	public TemplateMaster templateMaster = null;
 
 	/** Cached template path+file name. */
 	public String templateFileStr = null;
@@ -39,7 +42,12 @@ public class Template {
 	public byte[] html_raw_bytes = null;
 
 	/** Cached template split into separate html/xml elements. */
-	public List<HTMLItem> html_items = null;
+	public List<HtmlItem> html_items = null;
+
+	/** Master template. */
+	public Template master = null;
+
+	public List<TemplatePlace> places;
 
 	/**
 	 * Disable public constructor.
@@ -53,8 +61,9 @@ public class Template {
 	 * @param templateFile template file-system <code>File</code> object.
 	 * @return a parsed and split template file.
 	 */
-	public static Template getInstance(String templateFileStr, File templateFile) {
+	public static Template getInstance(TemplateMaster templateMaster, String templateFileStr, File templateFile) {
 		Template template = new Template();
+		template.templateMaster = templateMaster;
 		template.templateFileStr = templateFileStr;
 		template.templateFile = templateFile;
 		template.reload();
@@ -84,11 +93,29 @@ public class Template {
 				InputStreamReader reader = new InputStreamReader( is, "utf-8" );
 
 				// Parse html into a List of html items.
-				HTMLParser htmlParser = new HTMLParser();
+				HtmlParser htmlParser = new HtmlParser();
 				html_items = htmlParser.parse( HtmlReaderInput.getInstance( reader ) );
 
 				// Validate html. 
 				HtmlValidator.validate( html_items );
+
+				if ( html_items != null ) {
+					HtmlItem htmlItem;
+					String tagname;
+					String file;
+					for ( int i=0; i<html_items.size(); ++i ) {
+						htmlItem = html_items.get( i );
+						if ( htmlItem.getType() == HtmlItem.T_DIRECTIVE ) {
+							tagname = htmlItem.getTagname();
+							if ( "master".compareToIgnoreCase( tagname ) == 0 ) {
+								file = htmlItem.getAttribute( "file" );
+								if ( file != null && file.length() > 1 ) {
+									master = templateMaster.getTemplate( file );
+								}
+							}
+						}
+					}
+				}
 
 				reader.close();
 				is.close();
@@ -103,7 +130,7 @@ public class Template {
 	}
 
 	// Check for valid character encoding and cache per encoding.
-	public TemplateParts filterTemplate(List<TemplatePlace> placeHolders, String character_encoding) throws UnsupportedEncodingException, IOException {
+	public TemplateParts filterTemplate(List<TemplatePlaceBase> placeHolders, String character_encoding) throws UnsupportedEncodingException, IOException {
 		TemplateParts templateParts = new TemplateParts();
 
 		String tagName;
@@ -117,16 +144,19 @@ public class Template {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		out.reset();
 
-		HTMLItem htmlItem;
-		TemplatePlace templatePlace;
-		TemplatePart templatePart;
+		HtmlItem htmlItem;
+		TemplatePlaceBase templatePlace;
+		TemplatePartBase templatePart;
 
 		if ( html_items != null ) {
 			int i = 0;
 			while (  i<html_items.size() ) {
 				htmlItem = html_items.get( i );
 				switch ( htmlItem.getType() ) {
-				case HTMLItem.T_TAG:
+				case HtmlItem.T_DIRECTIVE:
+					System.out.println( "@directive: " + htmlItem.getTagname().toLowerCase() );
+					break;
+				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
 					id = htmlItem.getAttribute( "id" );
 					name = htmlItem.getAttribute( "name" );
@@ -138,14 +168,14 @@ public class Template {
 					if ( "i18n".compareTo( tagName ) == 0 ) {
 						text_id = htmlItem.getAttribute( "text_id" );
 						if ( text_id != null && text_id.length() > 0 ) {
-							templatePart = TemplatePart.getTemplatePartI18N( (HTMLItem)htmlItem.clone() );
+							templatePart = TemplatePartBase.getTemplatePartI18N( (HtmlItem)htmlItem.clone() );
 							templateParts.i18nList.add( (TemplatePartI18N)templatePart );
 						}
 						f = true;
 					}
 					else if ( "placeholder".compareTo( tagName) == 0 ) {
 						if ( id != null && id.length() > 0 ) {
-							templatePart = TemplatePart.getTemplatePartPlaceHolder( (HTMLItem)htmlItem.clone() );
+							templatePart = TemplatePartBase.getTemplatePartPlaceHolder( (HtmlItem)htmlItem.clone() );
 							templateParts.placeHoldersMap.put( id, (TemplatePartPlaceHolder)templatePart );
 						}
 						f = true;
@@ -157,10 +187,10 @@ public class Template {
 							if ( j < placeHolders.size() ) {
 								templatePlace = placeHolders.get( j );
 								switch ( templatePlace.type ) {
-								case TemplatePlace.PH_TAG:
+								case TemplatePlaceBase.PH_TAG:
 									if ( templatePlace.tagName.compareTo( tagName ) == 0 ) {
 										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
-											templatePart = TemplatePart.getTemplatePartTag( (HTMLItem)htmlItem.clone() );
+											templatePart = TemplatePartBase.getTemplatePartTag( (HtmlItem)htmlItem.clone() );
 											templatePlace.templatePart = templatePart;
 											templatePlace.htmlItem = templatePart.htmlItem;
 											b = false;
@@ -168,7 +198,7 @@ public class Template {
 										}
 									}
 									break;
-								case TemplatePlace.PH_PLACEHOLDER:
+								case TemplatePlaceBase.PH_PLACEHOLDER:
 									if ( "placeholder".compareTo( tagName) == 0 ) {
 										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
 											templatePlace.templatePart = templatePart;
@@ -188,7 +218,7 @@ public class Template {
 					}
 					if ( f ) {
 						if ( out.size() > 0 ) {
-							templateParts.parts.add( TemplatePart.getTemplatePartStatic( out.toByteArray() ) );
+							templateParts.parts.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
 							out.reset();
 						}
 						if ( templatePart != null ) {
@@ -199,18 +229,18 @@ public class Template {
 						out.write( htmlItem.getText().getBytes( character_encoding ) );
 					}
 					break;
-				case HTMLItem.T_ENDTAG:
-				case HTMLItem.T_TEXT:
-				case HTMLItem.T_PROCESSING:
-				case HTMLItem.T_EXCLAMATION:
-				case HTMLItem.T_COMMENT:
+				case HtmlItem.T_ENDTAG:
+				case HtmlItem.T_TEXT:
+				case HtmlItem.T_PROCESSING:
+				case HtmlItem.T_EXCLAMATION:
+				case HtmlItem.T_COMMENT:
 					out.write( htmlItem.getText().getBytes( character_encoding ) );
 					break;
 				}
 				++i;
 			}
 			if ( out.size() > 0 ) {
-				templateParts.parts.add( TemplatePart.getTemplatePartStatic( out.toByteArray() ) );
+				templateParts.parts.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
 				out.reset();
 			}
 		}

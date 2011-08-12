@@ -9,9 +9,9 @@ package com.antiaction.raptor.template;
 
 import java.io.UnsupportedEncodingException;
 
-import com.antiaction.common.html.HTMLItem;
+import com.antiaction.common.html.HtmlItem;
 
-public class TemplatePartI18N extends TemplatePart {
+public class TemplatePartI18N extends TemplatePartBase {
 
 	private String text_id = "";
 
@@ -22,7 +22,7 @@ public class TemplatePartI18N extends TemplatePart {
 	private TemplatePartI18N() {
 	}
 
-	public static TemplatePartI18N getInstance(HTMLItem htmlItem) {
+	public static TemplatePartI18N getInstance(HtmlItem htmlItem) {
 		TemplatePartI18N part = new TemplatePartI18N();
 		part.htmlItem = htmlItem;
 		part.text_id = htmlItem.getAttribute( "text_id" );
