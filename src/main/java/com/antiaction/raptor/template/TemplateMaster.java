@@ -57,6 +57,7 @@ public class TemplateMaster {
 
 	/**
 	 * Given a template filename with relative path returns a template interaction object.
+	 * Tge template is either loaded or cached and only reloaded if the content has been updated.
 	 * @param templateFileStr template filename with relative path.
 	 * @return prepared template interaction object.
 	 */
@@ -67,9 +68,7 @@ public class TemplateMaster {
 			template = templateMap.get( templateFileStr );
 			if ( template != null ) {
 				if ( templateFile.exists() && templateFile.isFile() ) {
-					if ( template.last_modified != templateFile.lastModified() || template.last_file_length != templateFile.length() ) {
-						template.reload();
-					}
+					template.check_reload();
 				}
 				else {
 					template = null;
