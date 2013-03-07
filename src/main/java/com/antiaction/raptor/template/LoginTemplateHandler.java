@@ -26,6 +26,8 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 
 	public String templateName = null;
 
+	public String title = null;
+
 	public String adminPath = "/admin/";
 
 	public void logoff(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws IOException {
@@ -139,13 +141,15 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 			//System.out.println( template );
 
 			if ( template != null ) {
-				TemplatePlaceHolder errorPlace = TemplatePlaceBase.getTemplatePlaceHolder( "errorPlace" );
+				//TemplatePlaceTag title = TemplatePlaceBase.getTemplatePlaceTag( "title", null );
+				TemplatePlaceHolder titlePlace = TemplatePlaceBase.getTemplatePlaceHolder( "title" );
+				TemplatePlaceHolder errorPlace = TemplatePlaceBase.getTemplatePlaceHolder( "error" );
 				TemplatePlaceTag loginUser = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_user" );
-				//TemplateTagPlace loginPass = TemplatePlace.getTemplateTagPlace( "input", "login_pass" );
 				TemplatePlaceTag loginRemember = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_rememberme" );
 				TemplatePlaceTag loginToUrl = TemplatePlaceBase.getTemplatePlaceTag( "input", "login_tourl" );
 
 				List<TemplatePlaceBase> placeHolders = new ArrayList<TemplatePlaceBase>();
+				placeHolders.add( titlePlace );
 				placeHolders.add( errorPlace );
 				placeHolders.add( loginUser );
 				placeHolders.add( loginRemember );
@@ -155,20 +159,24 @@ public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 
 				//loginUser.htmlItem.setAttribute( "value", HTMLEntity.encodeHtmlEntities( "'\"&<>" ).toString() );
 
-				if ( bError ) {
+				if ( titlePlace != null ) {
+					titlePlace.setText( HtmlEntity.encodeHtmlEntities( title ).toString() );
+				}
+
+				if ( errorPlace != null && bError ) {
 					String invalid = callback.getTranslated( "raptor.login.invalid" );
 					errorPlace.setText( "<img width=\"16\" height=\"16\" src=\"/images/login/error.gif\" alt=\""+ invalid + "\">" + invalid );
 				}
 
-				if ( user != null ) {
+				if ( loginUser != null && user != null ) {
 					loginUser.setAttribute( "value", HtmlEntity.encodeHtmlEntities( user ).toString() );
 				}
 
-				if ( rememberMe != null ) {
+				if ( loginRemember != null && rememberMe != null ) {
 					loginRemember.setAttribute( "checked", null );
 				}
 
-				if ( toUrl != null ) {
+				if ( loginToUrl != null && toUrl != null ) {
 					loginToUrl.setAttribute( "value", HtmlEntity.encodeHtmlEntities( toUrl ).toString() );
 				}
 				else {

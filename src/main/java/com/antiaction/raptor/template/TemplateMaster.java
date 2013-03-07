@@ -34,6 +34,10 @@ public class TemplateMaster {
 	/** List of cached <code>Template</code> instances. */
 	private List<Template> templateList = new ArrayList<Template>();
 
+	private Map<String, TemplateBlocks> blocksMap = new HashMap<String, TemplateBlocks>();
+
+	private List<TemplateBlocks> blocksList = new ArrayList<TemplateBlocks>();
+
 	/*
 	 * Prevent creation of identical instances.
 	 */
@@ -83,6 +87,30 @@ public class TemplateMaster {
 			}
 		}
 		return template;
+	}
+
+	public TemplateBlocks getTemplateBlocks(String blocksFileStr) {
+		File blocksFile = new File( templatePath, blocksFileStr );
+		TemplateBlocks blocks = null;
+		synchronized ( blocksMap ) {
+			blocks = blocksMap.get( blocksFileStr );
+			if ( blocks != null ) {
+				if ( blocksFile.exists() && blocksFile.isFile() ) {
+					blocks.check_reload();
+				}
+				else {
+					blocks = null;
+				}
+			}
+			else {
+				blocks = TemplateBlocks.getInstance( this, blocksFileStr, blocksFile );
+				if ( blocks != null ) {
+					blocksMap.put( blocksFileStr, blocks );
+					blocksList.add( blocks );
+				}
+			}
+		}
+		return blocks;
 	}
 
 }

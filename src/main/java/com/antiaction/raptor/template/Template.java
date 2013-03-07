@@ -17,49 +17,67 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.antiaction.common.html.HtmlItem;
 import com.antiaction.common.html.HtmlParser;
 import com.antiaction.common.html.HtmlReaderInput;
+import com.antiaction.common.html.HtmlText;
 
 public class Template {
 
 	/** Template Master. */
-	public TemplateMaster templateMaster = null;
+	protected TemplateMaster templateMaster = null;
+
+	/*
+	 * Source template.
+	 */
 
 	/** Cached template path+file name. */
-	public String templateFileStr = null;
+	protected String templateFileStr = null;
 
 	/** Cached template <code>File</code> object. */
-	public File templateFile = null;
+	protected File templateFile = null;
 
-	/** Cached template modified date. */
-	public long last_modified = -1;
+	/** Cached template, modified date. */
+	protected long last_modified = -1;
 
-	/** Cached template file length. */
-	public long last_file_length = -1;
+	/** Cached template, file length. */
+	protected long last_file_length = -1;
 
-	/** Cached template raw bytes. */
-	public byte[] html_raw_bytes = null;
+	/** Cached template, raw bytes. */
+	protected byte[] html_raw_bytes = null;
 
-	/** Cached template split into separate html/xml elements. */
-	public List<HtmlItem> html_items_cached = null;
+	/** Cached template, raw file converted into separate html/xml elements. */
+	protected List<HtmlItem> html_items_cached = null;
 
-	public List<HtmlItem> html_items_work = null;
+	/*
+	 * Master template
+	 */
 
 	/** Master template. */
-	public Template master = null;
+	protected Template master = null;
 
-	public List<TemplatePlace> placesList = new ArrayList<TemplatePlace>();
+	/** <code>List</code> of <code>Place</code> tags in template. */
+	protected List<TemplateMasterPlace> masterPlacesList = new ArrayList<TemplateMasterPlace>();
 
-	public Map<String, TemplatePlace> placesMap = new HashMap<String, TemplatePlace>();;
+	/** <code>Map</code> of (id, <code>Place</code>) pairs in template. */
+	protected Map<String, TemplateMasterPlace> masterPlacesMap = new HashMap<String, TemplateMasterPlace>();;
+
+	/*
+	 * Processed template data.
+	 */
+
+	/** Prepared <code>List<code> of <code>HtmlItem</code> objects. */
+	protected List<HtmlItem> html_items_work = null;
 
 	/**
 	 * Disable public constructor.
 	 */
-	private Template() {
+	protected Template() {
 	}
 
 	/**
@@ -75,17 +93,6 @@ public class Template {
 		template.templateFile = templateFile;
 		template.load();
 		return template;
-	}
-
-	public void load() {
-		reload();
-		if ( master != null ) {
-			master.check_reload();
-			master_process();
-		}
-		if ( html_items_work == null && html_items_cached != null ) {
-			html_items_work = new ArrayList<HtmlItem>( html_items_cached );
-		}
 	}
 
 	public boolean check_reload() {
@@ -110,11 +117,25 @@ public class Template {
 	}
 
 	/**
-	 * Load or reload a template file parsing and splitting it into sub-parts.
+	 * Loads and initializes a template.
+	 */
+	protected void load() {
+		reload();
+		if ( master != null ) {
+			master.check_reload();
+			master_process();
+		}
+		if ( html_items_work == null && html_items_cached != null ) {
+			html_items_work = new ArrayList<HtmlItem>( html_items_cached );
+		}
+	}
+
+	/**
+	 * Load or reload a template file parsing and splitting it into <code>HtmlItem</code >sub-parts.
 	 * Also makes call to check for use of master page.
 	 * TODO detect character encoding before turning into String internally.
 	 */
-	public void reload() {
+	protected void reload() {
 		RandomAccessFile ram;
 		try {
 			if ( templateFile.exists() && templateFile.isFile() ) {
@@ -154,8 +175,8 @@ public class Template {
 				html_items_cached = null;
 				html_items_work = null;
 				master = null;
-				placesList.clear();
-				placesMap.clear();
+				masterPlacesList.clear();
+				masterPlacesMap.clear();
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -167,13 +188,13 @@ public class Template {
 	}
 
 	/**
-	 * Process list of <code>HtmlItems</code> to check for use of a master file.
+	 * Process list of <code>HtmlItem</code> objects to check for use of a master file.
 	 */
-	public void check_master_use() {
+	protected void check_master_use() {
 		HtmlItem htmlItem;
 		String tagname;
 		String file;
-		TemplatePlace place;
+		TemplateMasterPlace masterplace;
 
 		if ( html_items_cached != null ) {
 			for ( int i=0; i<html_items_cached.size(); ++i ) {
@@ -190,10 +211,10 @@ public class Template {
 			}
 
 			if ( master != null ) {
-				placesList.clear();
-				placesMap.clear();
+				masterPlacesList.clear();
+				masterPlacesMap.clear();
 
-				place = null;
+				masterplace = null;
 				String placeholder;
 
 				for ( int i=0; i<html_items_cached.size(); ++i ) {
@@ -201,18 +222,18 @@ public class Template {
 					if ( htmlItem.getType() == HtmlItem.T_TAG && "place".compareToIgnoreCase( htmlItem.getTagname() ) == 0 ) {
 						placeholder = htmlItem.getAttribute( "placeholder" );
 						if ( placeholder != null && placeholder.length() > 0 ) {
-							place = new TemplatePlace();
-							place.placeholder = placeholder;
-							placesList.add( place );
-							placesMap.put( place.placeholder, place );
+							masterplace = new TemplateMasterPlace();
+							masterplace.placeholder = placeholder;
+							masterPlacesList.add( masterplace );
+							masterPlacesMap.put( masterplace.placeholder, masterplace );
 						}
 					}
 					else if ( htmlItem.getType() == HtmlItem.T_ENDTAG && "place".compareToIgnoreCase( htmlItem.getTagname() ) == 0 ) {
-						place = null;
+						masterplace = null;
 					}
 					else {
-						if ( place != null ) {
-							place.htmlItems.add( htmlItem );
+						if ( masterplace != null ) {
+							masterplace.htmlItems.add( htmlItem );
 						}
 					}
 				}
@@ -223,11 +244,11 @@ public class Template {
 	/**
 	 * Create a new <code>HtmlItem</code> work list based on the master template and the current template.
 	 */
-	public void master_process() {
+	protected void master_process() {
 		HtmlItem htmlItem;
 		String tagName;
 		String id;
-		TemplatePlace place;
+		TemplateMasterPlace masterplace;
 
 		if ( master != null && html_items_work == null ) {
 			html_items_work = new ArrayList<HtmlItem>( master.html_items_work );
@@ -240,10 +261,10 @@ public class Template {
 					id = htmlItem.getAttribute( "id" );
 					if ( "placeholder".compareTo( tagName) == 0 ) {
 						if ( id != null && id.length() > 0 ) {
-							place = placesMap.get( id );
-							if ( place != null ) {
+							masterplace = masterPlacesMap.get( id );
+							if ( masterplace != null ) {
 								html_items_work.remove( idx );
-								html_items_work.addAll( idx, place.htmlItems );
+								html_items_work.addAll( idx, masterplace.htmlItems );
 							}
 						}
 					}
@@ -251,6 +272,73 @@ public class Template {
 				--idx;
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param tagnameList
+	 * @return
+	 */
+	public int prepare(List<String> tagnameList) {
+		Set<String> tagnameSet = new HashSet<String>();
+		if ( tagnameList != null ) {
+			for ( int i=0; i<tagnameList.size(); ++i ) {
+				tagnameSet.add( tagnameList.get( i ).toLowerCase() );
+			}
+		}
+
+		HtmlItem htmlItem;
+		String tagName;
+
+		int reductions = 0;
+
+		StringBuffer sb = new StringBuffer();
+
+		if ( html_items_work != null ) {
+			int i = 0;
+			while ( i<html_items_work.size() ) {
+				htmlItem = html_items_work.get( i );
+				switch ( htmlItem.getType() ) {
+				case HtmlItem.T_DIRECTIVE:
+					html_items_work.remove( i );
+					++reductions;
+					// debug
+					System.out.println( "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
+					break;
+				case HtmlItem.T_COMMENT:
+				case HtmlItem.T_EXCLAMATION:
+				case HtmlItem.T_PROCESSING:
+				case HtmlItem.T_ENDTAG:
+				case HtmlItem.T_TEXT:
+					html_items_work.remove( i );
+					sb.append( htmlItem.getText() );
+					++reductions;
+					break;
+				case HtmlItem.T_TAG:
+					tagName = htmlItem.getTagname().toLowerCase();
+					if ( "i18n".compareTo( tagName ) == 0 || "placeholder".compareTo( tagName ) == 0 || tagnameSet.contains( tagName ) ) {
+						if ( sb.length() > 0 ) {
+							html_items_work.add( i, new HtmlText( sb.toString() ) );
+							sb.setLength( 0 );
+							++i;
+						}
+						++i;
+					}
+					else {
+						html_items_work.remove( i );
+						sb.append( htmlItem.getText() );
+						++reductions;
+					}
+					break;
+				}
+			}
+			if ( sb.length() > 0 ) {
+				html_items_work.add( new HtmlText( sb.toString() ) );
+				sb.setLength( 0 );
+			}
+		}
+
+		return reductions;
 	}
 
 	// Check for valid character encoding and cache per encoding.
@@ -278,7 +366,7 @@ public class Template {
 				htmlItem = html_items_work.get( i );
 				switch ( htmlItem.getType() ) {
 				case HtmlItem.T_DIRECTIVE:
-					System.out.println( "@directive: " + htmlItem.getTagname().toLowerCase() );
+					System.out.println( "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
 					break;
 				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
@@ -297,7 +385,7 @@ public class Template {
 						}
 						f = true;
 					}
-					else if ( "placeholder".compareTo( tagName) == 0 ) {
+					else if ( "placeholder".compareTo( tagName ) == 0 ) {
 						if ( id != null && id.length() > 0 ) {
 							templatePart = TemplatePartBase.getTemplatePartPlaceHolder( (HtmlItem)htmlItem.clone() );
 							templateParts.placeHoldersMap.put( id, (TemplatePartPlaceHolder)templatePart );
@@ -323,7 +411,7 @@ public class Template {
 									}
 									break;
 								case TemplatePlaceBase.PH_PLACEHOLDER:
-									if ( "placeholder".compareTo( tagName) == 0 ) {
+									if ( "placeholder".compareTo( tagName ) == 0 ) {
 										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
 											templatePlace.templatePart = templatePart;
 											templatePlace.htmlItem = templatePart.htmlItem;
@@ -374,7 +462,12 @@ public class Template {
 		return templateParts;
 	}
 
-	public class TemplatePlace {
+	/**
+	 * Internal class to keep track of <code>Place</code> tags in a master template.
+	 * @author Nicholas
+	 *
+	 */
+	public class TemplateMasterPlace {
 
 		public String placeholder = null;
 
