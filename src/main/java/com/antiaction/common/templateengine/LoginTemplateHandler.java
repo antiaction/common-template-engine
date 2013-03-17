@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-package com.antiaction.raptor.template;
+package com.antiaction.common.templateengine;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.antiaction.common.html.HtmlEntity;
-import com.antiaction.raptor.frontend.Caching;
+import com.antiaction.common.servlet.Caching;
 
 public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 

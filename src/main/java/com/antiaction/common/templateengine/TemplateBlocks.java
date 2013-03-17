@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-package com.antiaction.raptor.template;
+package com.antiaction.common.templateengine;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
