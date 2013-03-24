@@ -31,20 +31,21 @@ public class TemplatePlaceHolder extends TemplatePlaceBase {
 		if ( templatePart != null ) {
 			((TemplatePartPlaceHolder)templatePart).setText( text );
 		}
+		if ( text != null ) {
+			try {
+				ByteArrayInputStream is = new ByteArrayInputStream( text.getBytes() );
 
-		try {
-			ByteArrayInputStream is = new ByteArrayInputStream( text.getBytes() );
+				// Parse html into a List of html items.
+				HtmlParser htmlParser = new HtmlParser();
+				List<HtmlItem> html_items = htmlParser.parse( is );
 
-			// Parse html into a List of html items.
-			HtmlParser htmlParser = new HtmlParser();
-			List<HtmlItem> html_items = htmlParser.parse( is );
-
-			// Validate html. 
-			HtmlValidator.validate( html_items );
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				// Validate html. 
+				HtmlValidator.validate( html_items );
+			}
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
