@@ -61,10 +61,10 @@ public class Template {
 	/** Master template. */
 	protected Template master = null;
 
-	/** <code>List</code> of <code>Place</code> tags in template. */
+	/** <code>List</code> of <code>Place</code> tags in master template. */
 	protected List<TemplateMasterPlace> masterPlacesList = new ArrayList<TemplateMasterPlace>();
 
-	/** <code>Map</code> of (id, <code>Place</code>) pairs in template. */
+	/** <code>Map</code> of (id, <code>Place</code>) pairs in master template. */
 	protected Map<String, TemplateMasterPlace> masterPlacesMap = new HashMap<String, TemplateMasterPlace>();;
 
 	/*
@@ -75,7 +75,7 @@ public class Template {
 	protected List<HtmlItem> html_items_work = null;
 
 	/**
-	 * Disable public constructor.
+	 * Prevent creation of identical instances.
 	 */
 	protected Template() {
 	}
@@ -95,6 +95,11 @@ public class Template {
 		return template;
 	}
 
+	/**
+	 * Check if the template and/or its master have changed and reload them.
+	 * Re-process the master if it is reloaded.
+	 * @return boolean indicating the template and/or master was reloaded
+	 */
 	public boolean check_reload() {
 		boolean reloaded = false;
 		if ( last_modified != templateFile.lastModified() || last_file_length != templateFile.length() ) {
@@ -189,6 +194,7 @@ public class Template {
 
 	/**
 	 * Process list of <code>HtmlItem</code> objects to check for use of a master file.
+	 * If there is a master this templates content is copied into separate template master places.
 	 */
 	protected void check_master_use() {
 		HtmlItem htmlItem;
@@ -197,6 +203,9 @@ public class Template {
 		TemplateMasterPlace masterplace;
 
 		if ( html_items_cached != null ) {
+			/*
+			 * Look for at <@master file="..."> directive.
+			 */
 			for ( int i=0; i<html_items_cached.size(); ++i ) {
 				htmlItem = html_items_cached.get( i );
 				if ( htmlItem.getType() == HtmlItem.T_DIRECTIVE ) {
@@ -215,17 +224,21 @@ public class Template {
 				masterPlacesMap.clear();
 
 				masterplace = null;
-				String placeholder;
+				String placeholderName;
 
+				/*
+				 * Look for <place placeholder="place_name">[content]</place> structures.
+				 * Place [content] inside named template master places.
+				 */
 				for ( int i=0; i<html_items_cached.size(); ++i ) {
 					htmlItem = html_items_cached.get( i );
 					if ( htmlItem.getType() == HtmlItem.T_TAG && "place".compareToIgnoreCase( htmlItem.getTagname() ) == 0 ) {
-						placeholder = htmlItem.getAttribute( "placeholder" );
-						if ( placeholder != null && placeholder.length() > 0 ) {
+						placeholderName = htmlItem.getAttribute( "placeholder" );
+						if ( placeholderName != null && placeholderName.length() > 0 ) {
 							masterplace = new TemplateMasterPlace();
-							masterplace.placeholder = placeholder;
+							masterplace.placeholderName = placeholderName;
 							masterPlacesList.add( masterplace );
-							masterPlacesMap.put( masterplace.placeholder, masterplace );
+							masterPlacesMap.put( masterplace.placeholderName, masterplace );
 						}
 					}
 					else if ( htmlItem.getType() == HtmlItem.T_ENDTAG && "place".compareToIgnoreCase( htmlItem.getTagname() ) == 0 ) {
@@ -243,6 +256,7 @@ public class Template {
 
 	/**
 	 * Create a new <code>HtmlItem</code> work list based on the master template and the current template.
+	 * Loop through the master template inserting <place> content into the <placeholder> location. 
 	 */
 	protected void master_process() {
 		HtmlItem htmlItem;
@@ -464,12 +478,10 @@ public class Template {
 
 	/**
 	 * Internal class to keep track of <code>Place</code> tags in a master template.
-	 * @author Nicholas
-	 *
 	 */
 	public class TemplateMasterPlace {
 
-		public String placeholder = null;
+		public String placeholderName = null;
 
 		public List<HtmlItem> htmlItems = new ArrayList<HtmlItem>();
 

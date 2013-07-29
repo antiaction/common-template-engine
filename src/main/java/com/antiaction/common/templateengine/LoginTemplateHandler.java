@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.antiaction.common.filter.Caching;
 import com.antiaction.common.html.HtmlEntity;
-import com.antiaction.common.servlet.Caching;
 
 public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 

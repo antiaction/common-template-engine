@@ -17,31 +17,33 @@ import java.util.Map;
  * Entry point for interacting with the template system. 
  * Currently only a single <code>TemplateMaster</code> instance is supported. 
  * <code>Template</code> instances are created and cached through the master.
- * @author Nicholas
  *
+ * @author Nicholas
  */
 public class TemplateMaster {
 
 	/** <code>TemplateMaster</code> singleton instance. */
-	private static TemplateMaster templateMaster = null;
+	protected static TemplateMaster templateMaster = null;
 
 	/** Path to root of template files. */
-	private File templatePath = null;
+	protected File templatePath = null;
 
 	/** Map of cached <code>Template</code> instances. */
-	private Map<String, Template> templateMap = new HashMap<String, Template>();
+	protected Map<String, Template> templateMap = new HashMap<String, Template>();
 
 	/** List of cached <code>Template</code> instances. */
-	private List<Template> templateList = new ArrayList<Template>();
+	protected List<Template> templateList = new ArrayList<Template>();
 
-	private Map<String, TemplateBlocks> blocksMap = new HashMap<String, TemplateBlocks>();
+	/** Map of cached <code>TemplateBlocks</code> instances. */
+	protected Map<String, TemplateBlocks> blocksMap = new HashMap<String, TemplateBlocks>();
 
-	private List<TemplateBlocks> blocksList = new ArrayList<TemplateBlocks>();
+	/** List of cached <code>TemplateBlocks</code> instances. */
+	protected List<TemplateBlocks> blocksList = new ArrayList<TemplateBlocks>();
 
 	/*
 	 * Prevent creation of identical instances.
 	 */
-	private TemplateMaster() {
+	protected TemplateMaster() {
 	}
 
 	/**
@@ -61,9 +63,9 @@ public class TemplateMaster {
 
 	/**
 	 * Given a template filename with relative path returns a template interaction object.
-	 * Tge template is either loaded or cached and only reloaded if the content has been updated.
-	 * @param templateFileStr template filename with relative path.
-	 * @return prepared template interaction object.
+	 * The template is either loaded and cached and only reloaded if the content changes.
+	 * @param templateFileStr template filename with relative path
+	 * @return prepared template interaction object
 	 */
 	public Template getTemplate(String templateFileStr) {
 		File templateFile = new File( templatePath, templateFileStr );
@@ -89,6 +91,12 @@ public class TemplateMaster {
 		return template;
 	}
 
+	/**
+	 * Given a template blocks filename with relative path returns a template blocks interactive object.
+	 * The template blocks are either loaded and cached and only reloaded if the content changes.
+	 * @param blocksFileStr template blocks filename with relative path
+	 * @return prepared template blocks interactive object
+	 */
 	public TemplateBlocks getTemplateBlocks(String blocksFileStr) {
 		File blocksFile = new File( templatePath, blocksFileStr );
 		TemplateBlocks blocks = null;

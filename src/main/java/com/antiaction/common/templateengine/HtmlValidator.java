@@ -16,6 +16,12 @@ import com.antiaction.common.html.HtmlItem;
 
 public class HtmlValidator {
 
+	/*
+	 * Prohibit instantiation.
+	 */
+	protected HtmlValidator() {
+	}
+
 	public static Set<String> noselfchild = new HashSet<String>();
 
 	static {
