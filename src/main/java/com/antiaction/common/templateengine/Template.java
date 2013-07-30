@@ -27,6 +27,11 @@ import com.antiaction.common.html.HtmlParser;
 import com.antiaction.common.html.HtmlReaderInput;
 import com.antiaction.common.html.HtmlText;
 
+/**
+ * Thread-safe as long as check_reload() is the only method used externally.
+ *
+ * @author Nicholas
+ */
 public class Template {
 
 	/** Template Master. */
@@ -51,12 +56,14 @@ public class Template {
 	/** Cached template, raw bytes. */
 	protected byte[] html_raw_bytes = null;
 
-	/** Cached template, raw file converted into separate html/xml elements. */
+	/** Cached template, raw file converted into separate HTML/XML elements. */
 	protected List<HtmlItem> html_items_cached = null;
 
 	/*
 	 * Master template
 	 */
+
+	protected long masterProcessedTS;
 
 	/** Master template. */
 	protected Template master = null;
@@ -100,14 +107,14 @@ public class Template {
 	 * Re-process the master if it is reloaded.
 	 * @return boolean indicating the template and/or master was reloaded
 	 */
-	public boolean check_reload() {
+	public synchronized boolean check_reload() {
 		boolean reloaded = false;
 		if ( last_modified != templateFile.lastModified() || last_file_length != templateFile.length() ) {
 			reload();
 			reloaded = true;
 		}
 		if ( master != null ) {
-			if ( master.check_reload() ) {
+			if ( master.check_reload() || master.last_modified > masterProcessedTS ) {
 				html_items_work = null;
 				reloaded = true;
 			}
@@ -285,6 +292,7 @@ public class Template {
 				}
 				--idx;
 			}
+			masterProcessedTS = System.currentTimeMillis();
 		}
 	}
 

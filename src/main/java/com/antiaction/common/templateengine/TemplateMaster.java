@@ -16,7 +16,8 @@ import java.util.Map;
 /**
  * Entry point for interacting with the template system. 
  * Currently only a single <code>TemplateMaster</code> instance is supported. 
- * <code>Template</code> instances are created and cached through the master.
+ * <code>Template</code> instances are created and cached through the master. 
+ * This implementation is thread-safe.
  *
  * @author Nicholas
  */
@@ -53,7 +54,7 @@ public class TemplateMaster {
 	 * @param templatePath path to root of template files
 	 * @return <code>TemplateMaster</code> instance
 	 */
-	public static TemplateMaster getInstance(String templatePath) {
+	public static synchronized TemplateMaster getInstance(String templatePath) {
 		if ( templateMaster == null ) {
 			templateMaster = new TemplateMaster();
 			templateMaster.templatePath = new File( templatePath );
