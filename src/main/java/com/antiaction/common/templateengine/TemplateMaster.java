@@ -7,11 +7,13 @@
 
 package com.antiaction.common.templateengine;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.antiaction.common.templateengine.storage.TemplateStorage;
+import com.antiaction.common.templateengine.storage.TemplateStorageManager;
 
 /**
  * Entry point for interacting with the template system. 
@@ -24,10 +26,9 @@ import java.util.Map;
 public class TemplateMaster {
 
 	/** <code>TemplateMaster</code> singleton instance. */
-	protected static TemplateMaster templateMaster = null;
+	protected static Map<String, TemplateMaster> templateMasterMap = new HashMap<String, TemplateMaster>();
 
-	/** Path to root of template files. */
-	protected File templatePath = null;
+	protected List<TemplateStorageManager> templateStorageManagerList = new ArrayList<TemplateStorageManager>();
 
 	/** Map of cached <code>Template</code> instances. */
 	protected Map<String, Template> templateMap = new HashMap<String, Template>();
@@ -54,12 +55,32 @@ public class TemplateMaster {
 	 * @param templatePath path to root of template files
 	 * @return <code>TemplateMaster</code> instance
 	 */
-	public static synchronized TemplateMaster getInstance(String templatePath) {
-		if ( templateMaster == null ) {
-			templateMaster = new TemplateMaster();
-			templateMaster.templatePath = new File( templatePath );
+	public static TemplateMaster getInstance(String instanceId) {
+		synchronized ( templateMasterMap ) {
+			TemplateMaster templateMaster = templateMasterMap.get( instanceId );
+			if ( templateMaster == null ) {
+				templateMaster = new TemplateMaster();
+				templateMasterMap.put( instanceId, templateMaster );
+			}
+			return templateMaster;
 		}
-		return templateMaster;
+	}
+
+	public void addTemplateStorage(TemplateStorageManager tplStorMan) {
+		synchronized ( templateStorageManagerList ) {
+			templateStorageManagerList.add( tplStorMan );
+		}
+	}
+
+	public TemplateStorage getTemplateStorage(String templateFileStr) {
+		TemplateStorage templateStorage = null;
+		int idx = 0;
+		synchronized ( templateStorageManagerList ) {
+			while ( templateStorage == null && idx < templateStorageManagerList.size() ) {
+				templateStorage = templateStorageManagerList.get( idx++ ).getTemplateStorage( templateFileStr );
+			}
+		}
+		return templateStorage;
 	}
 
 	/**
@@ -69,27 +90,19 @@ public class TemplateMaster {
 	 * @return prepared template interaction object
 	 */
 	public Template getTemplate(String templateFileStr) {
-		File templateFile = new File( templatePath, templateFileStr );
-		Template template = null;
 		synchronized ( templateMap ) {
-			template = templateMap.get( templateFileStr );
-			if ( template != null ) {
-				if ( templateFile.exists() && templateFile.isFile() ) {
-					template.check_reload();
-				}
-				else {
-					template = null;
-				}
+			Template template = templateMap.get( templateFileStr );
+			if ( template == null ) {
+				TemplateStorage templateStorage = getTemplateStorage( templateFileStr );
+				template = Template.getInstance( this, templateStorage );
+				templateMap.put( templateFileStr, template );
+				templateList.add( template );
 			}
 			else {
-				template = Template.getInstance( this, templateFileStr, templateFile );
-				if ( template != null ) {
-					templateMap.put( templateFileStr, template );
-					templateList.add( template );
-				}
+				template.check_reload();
 			}
+			return template;
 		}
-		return template;
 	}
 
 	/**
@@ -99,27 +112,19 @@ public class TemplateMaster {
 	 * @return prepared template blocks interactive object
 	 */
 	public TemplateBlocks getTemplateBlocks(String blocksFileStr) {
-		File blocksFile = new File( templatePath, blocksFileStr );
-		TemplateBlocks blocks = null;
 		synchronized ( blocksMap ) {
-			blocks = blocksMap.get( blocksFileStr );
-			if ( blocks != null ) {
-				if ( blocksFile.exists() && blocksFile.isFile() ) {
-					blocks.check_reload();
-				}
-				else {
-					blocks = null;
-				}
+			TemplateBlocks blocks = blocksMap.get( blocksFileStr );
+			if ( blocks == null ) {
+				TemplateStorage templateStorage = getTemplateStorage( blocksFileStr );
+				blocks = TemplateBlocks.getInstance( this, templateStorage );
+				blocksMap.put( blocksFileStr, blocks );
+				blocksList.add( blocks );
 			}
 			else {
-				blocks = TemplateBlocks.getInstance( this, blocksFileStr, blocksFile );
-				if ( blocks != null ) {
-					blocksMap.put( blocksFileStr, blocks );
-					blocksList.add( blocks );
-				}
+				blocks.check_reload();
 			}
+			return blocks;
 		}
-		return blocks;
 	}
 
 }

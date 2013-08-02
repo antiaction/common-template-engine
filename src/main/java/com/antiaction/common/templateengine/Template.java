@@ -7,13 +7,8 @@
 
 package com.antiaction.common.templateengine;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,9 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.antiaction.common.html.HtmlItem;
-import com.antiaction.common.html.HtmlParser;
-import com.antiaction.common.html.HtmlReaderInput;
 import com.antiaction.common.html.HtmlText;
+import com.antiaction.common.templateengine.storage.TemplateStorage;
 
 /**
  * Thread-safe as long as check_reload() is the only method used externally.
@@ -41,20 +35,14 @@ public class Template {
 	 * Source template.
 	 */
 
-	/** Cached template path+file name. */
-	protected String templateFileStr = null;
-
-	/** Cached template <code>File</code> object. */
-	protected File templateFile = null;
+	/** Template storage object. */
+	protected TemplateStorage templateStorage = null;
 
 	/** Cached template, modified date. */
 	protected long last_modified = -1;
 
 	/** Cached template, file length. */
 	protected long last_file_length = -1;
-
-	/** Cached template, raw bytes. */
-	protected byte[] html_raw_bytes = null;
 
 	/** Cached template, raw file converted into separate HTML/XML elements. */
 	protected List<HtmlItem> html_items_cached = null;
@@ -93,11 +81,10 @@ public class Template {
 	 * @param templateFile template file-system <code>File</code> object.
 	 * @return a parsed and split template file.
 	 */
-	public static Template getInstance(TemplateMaster templateMaster, String templateFileStr, File templateFile) {
+	public static Template getInstance(TemplateMaster templateMaster, TemplateStorage templateStorage) {
 		Template template = new Template();
 		template.templateMaster = templateMaster;
-		template.templateFileStr = templateFileStr;
-		template.templateFile = templateFile;
+		template.templateStorage = templateStorage;
 		template.load();
 		return template;
 	}
@@ -109,21 +96,26 @@ public class Template {
 	 */
 	public synchronized boolean check_reload() {
 		boolean reloaded = false;
-		if ( last_modified != templateFile.lastModified() || last_file_length != templateFile.length() ) {
-			reload();
-			reloaded = true;
+		if ( templateStorage == null ) {
 		}
-		if ( master != null ) {
-			if ( master.check_reload() || master.last_modified > masterProcessedTS ) {
-				html_items_work = null;
+		if ( templateStorage != null ) {
+			templateStorage.checkReload();
+			if ( last_modified != templateStorage.lastModified() || last_file_length != templateStorage.length() ) {
+				reload();
 				reloaded = true;
 			}
-			if ( reloaded ) {
-				master_process();
+			if ( master != null ) {
+				if ( master.check_reload() || master.last_modified > masterProcessedTS ) {
+					html_items_work = null;
+					reloaded = true;
+				}
+				if ( reloaded ) {
+					master_process();
+				}
 			}
-		}
-		if ( html_items_work == null && html_items_cached != null ) {
-			html_items_work = new ArrayList<HtmlItem>( html_items_cached );
+			if ( html_items_work == null && html_items_cached != null ) {
+				html_items_work = new ArrayList<HtmlItem>( html_items_cached );
+			}
 		}
 		return reloaded;
 	}
@@ -148,54 +140,24 @@ public class Template {
 	 * TODO detect character encoding before turning into String internally.
 	 */
 	protected void reload() {
-		RandomAccessFile ram;
-		try {
-			if ( templateFile.exists() && templateFile.isFile() ) {
-				last_modified = templateFile.lastModified();
-				last_file_length = templateFile.length();
+		if ( templateStorage != null && templateStorage.exists() ) {
+			last_modified = templateStorage.lastModified();
+			last_file_length = templateStorage.length();
 
-				ram = new RandomAccessFile( templateFile, "r" );
-				html_raw_bytes = new byte[ (int)ram.length() ];
-				ram.readFully( html_raw_bytes );
-				ram.close();
+			html_items_cached = templateStorage.getHtmlItems();
+			html_items_work = null;
+			master = null;
 
-				// debug
-				System.out.println( "Template-loading: " + templateFile.getCanonicalFile() );
-
-				ByteArrayInputStream is = new ByteArrayInputStream( html_raw_bytes );
-				InputStreamReader reader = new InputStreamReader( is, "utf-8" );
-
-				// Parse html into a List of html items.
-				HtmlParser htmlParser = new HtmlParser();
-				html_items_cached = htmlParser.parse( HtmlReaderInput.getInstance( reader ) );
-				html_items_work = null;
-
-				reader.close();
-				is.close();
-
-				// Validate html. 
-				HtmlValidator.validate( html_items_cached );
-
-				master = null;
-
-				check_master_use();
-			}
-			else {
-				last_modified = -1;
-				last_file_length = -1;
-				html_raw_bytes = null;
-				html_items_cached = null;
-				html_items_work = null;
-				master = null;
-				masterPlacesList.clear();
-				masterPlacesMap.clear();
-			}
+			check_master_use();
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+		else {
+			last_modified = -1;
+			last_file_length = -1;
+			html_items_cached = null;
+			html_items_work = null;
+			master = null;
+			masterPlacesList.clear();
+			masterPlacesMap.clear();
 		}
 	}
 

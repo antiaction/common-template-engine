@@ -7,20 +7,13 @@
 
 package com.antiaction.common.templateengine;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.antiaction.common.html.HtmlItem;
-import com.antiaction.common.html.HtmlParser;
-import com.antiaction.common.html.HtmlReaderInput;
+import com.antiaction.common.templateengine.storage.TemplateStorage;
 
 public class TemplateBlocks {
 
@@ -31,20 +24,14 @@ public class TemplateBlocks {
 	 * Source template.
 	 */
 
-	/** Cached template path+file name. */
-	protected String blocksFileStr = null;
-
-	/** Cached template <code>File</code> object. */
-	protected File blocksFile = null;
+	/** Template storage object. */
+	protected TemplateStorage templateStorage = null;
 
 	/** Cached template modified date. */
 	protected long last_modified = -1;
 
 	/** Cached template file length. */
 	protected long last_file_length = -1;
-
-	/** Cached template raw bytes. */
-	protected byte[] html_raw_bytes = null;
 
 	/** Cached template split into separate html/xml elements. */
 	protected List<HtmlItem> html_items_cached = null;
@@ -63,19 +50,24 @@ public class TemplateBlocks {
 	protected TemplateBlocks() {
 	}
 
-	public static TemplateBlocks getInstance(TemplateMaster templateMaster, String blocksFileStr, File blocksFile) {
+	public static TemplateBlocks getInstance(TemplateMaster templateMaster, TemplateStorage templateStorage) {
 		TemplateBlocks template = new TemplateBlocks();
 		template.templateMaster = templateMaster;
-		template.blocksFileStr = blocksFileStr;
-		template.blocksFile = blocksFile;
+		template.templateStorage = templateStorage;
 		template.load();
 		return template;
 	}
 
 	public boolean check_reload() {
 		boolean reloaded = false;
-		if ( last_modified != blocksFile.lastModified() || last_file_length != blocksFile.length() ) {
-			reload();
+		if ( templateStorage == null ) {
+		}
+		if ( templateStorage != null ) {
+			templateStorage.checkReload();
+			if ( last_modified != templateStorage.lastModified() || last_file_length != templateStorage.length() ) {
+				reload();
+				reloaded = true;
+			}
 		}
 		return reloaded;
 	}
@@ -92,48 +84,22 @@ public class TemplateBlocks {
 	 * TODO detect character encoding before turning into String internally.
 	 */
 	protected void reload() {
-		RandomAccessFile ram;
-		try {
-			if ( blocksFile.exists() && blocksFile.isFile() ) {
-				last_modified = blocksFile.lastModified();
-				last_file_length = blocksFile.length();
+		if ( templateStorage != null && templateStorage.exists() ) {
+			last_modified = templateStorage.lastModified();
+			last_file_length = templateStorage.length();
 
-				ram = new RandomAccessFile( blocksFile, "r" );
-				html_raw_bytes = new byte[ (int)ram.length() ];
-				ram.readFully( html_raw_bytes );
-				ram.close();
+			html_items_cached = templateStorage.getHtmlItems();
 
-				// debug
-				System.out.println( "Template-blocks-loading: " + blocksFile.getCanonicalFile() );
-
-				ByteArrayInputStream is = new ByteArrayInputStream( html_raw_bytes );
-				InputStreamReader reader = new InputStreamReader( is, "utf-8" );
-
-				// Parse html into a List of html items.
-				HtmlParser htmlParser = new HtmlParser();
-				html_items_cached = htmlParser.parse( HtmlReaderInput.getInstance( reader ) );
-
-				reader.close();
-				is.close();
-
-				parse_blocks();
-			}
-			else {
-				last_modified = -1;
-				last_file_length = -1;
-				html_raw_bytes = null;
-				html_items_cached = null;
-			}
+			parse_blocks();
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+		else {
+			last_modified = -1;
+			last_file_length = -1;
+			html_items_cached = null;
 		}
 	}
 
-	public void parse_blocks() {
+	protected void parse_blocks() {
 		HtmlItem htmlItem;
 		String tagName;
 		String id;
