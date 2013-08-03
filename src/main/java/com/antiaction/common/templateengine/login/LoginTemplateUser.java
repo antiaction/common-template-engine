@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-package com.antiaction.common.templateengine;
+package com.antiaction.common.templateengine.login;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-package com.antiaction.common.templateengine;
+package com.antiaction.common.templateengine.login;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +19,12 @@ import javax.servlet.http.HttpSession;
 
 import com.antiaction.common.filter.Caching;
 import com.antiaction.common.html.HtmlEntity;
+import com.antiaction.common.templateengine.Template;
+import com.antiaction.common.templateengine.TemplateMaster;
+import com.antiaction.common.templateengine.TemplateParts;
+import com.antiaction.common.templateengine.TemplatePlaceBase;
+import com.antiaction.common.templateengine.TemplatePlaceHolder;
+import com.antiaction.common.templateengine.TemplatePlaceTag;
 
 public class LoginTemplateHandler<UserType extends LoginTemplateUser> {
 

@@ -258,6 +258,10 @@ public class Template {
 		}
 	}
 
+	public List<HtmlItem> getHtmlItems() {
+		return html_items_work;
+	}
+
 	/**
 	 * 
 	 * @param tagnameList
