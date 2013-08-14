@@ -10,8 +10,13 @@ package com.antiaction.common.templateengine.storage;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TemplateFileStorageManager implements TemplateStorageManager {
+
+    /** Logging mechanism. */
+	private static Logger logger = Logger.getLogger( TemplateFileStorageManager.class.getName() );
 
 	/** Map of cached <code>TemplateStorageManager</code> instances. */
 	protected static Map<String, TemplateFileStorageManager> pathMap = new HashMap<String, TemplateFileStorageManager>();
@@ -53,6 +58,9 @@ public class TemplateFileStorageManager implements TemplateStorageManager {
 				File templateFile = new File( templatePath, templateFileStr );
 				if ( templateFile.exists() && templateFile.isFile() ) {
 					tplStor = new TemplateFileStorage( templateFile );
+				}
+				else {
+					logger.log( Level.SEVERE, "Template missing: " + templateFile.getAbsolutePath() );
 				}
 			}
 			return tplStor;

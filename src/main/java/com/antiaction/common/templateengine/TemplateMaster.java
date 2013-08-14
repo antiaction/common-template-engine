@@ -94,7 +94,7 @@ public class TemplateMaster {
 			Template template = templateMap.get( templateFileStr );
 			if ( template == null ) {
 				TemplateStorage templateStorage = getTemplateStorage( templateFileStr );
-				template = Template.getInstance( this, templateStorage );
+				template = Template.getInstance( this, templateFileStr, templateStorage );
 				templateMap.put( templateFileStr, template );
 				templateList.add( template );
 			}
@@ -116,7 +116,7 @@ public class TemplateMaster {
 			TemplateBlocks blocks = blocksMap.get( blocksFileStr );
 			if ( blocks == null ) {
 				TemplateStorage templateStorage = getTemplateStorage( blocksFileStr );
-				blocks = TemplateBlocks.getInstance( this, templateStorage );
+				blocks = TemplateBlocks.getInstance( this, blocksFileStr, templateStorage );
 				blocksMap.put( blocksFileStr, blocks );
 				blocksList.add( blocks );
 			}

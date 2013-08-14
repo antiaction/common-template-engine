@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.antiaction.common.html.HtmlItem;
 import com.antiaction.common.html.HtmlText;
@@ -28,12 +30,17 @@ import com.antiaction.common.templateengine.storage.TemplateStorage;
  */
 public class Template {
 
+    /** Logging mechanism. */
+	private static Logger logger = Logger.getLogger( Template.class.getName() );
+
 	/** Template Master. */
 	protected TemplateMaster templateMaster = null;
 
 	/*
 	 * Source template.
 	 */
+
+	protected String templateFileStr = null;
 
 	/** Template storage object. */
 	protected TemplateStorage templateStorage = null;
@@ -50,6 +57,17 @@ public class Template {
 	/*
 	 * Master template
 	 */
+
+	/**
+	 * Internal class to keep track of <code>Place</code> tags in a master template.
+	 */
+	public class TemplateMasterPlace {
+
+		public String placeholderName = null;
+
+		public List<HtmlItem> htmlItems = new ArrayList<HtmlItem>();
+
+	}
 
 	protected long masterProcessedTS;
 
@@ -81,9 +99,10 @@ public class Template {
 	 * @param templateFile template file-system <code>File</code> object.
 	 * @return a parsed and split template file.
 	 */
-	public static Template getInstance(TemplateMaster templateMaster, TemplateStorage templateStorage) {
+	public static Template getInstance(TemplateMaster templateMaster, String templateFileStr, TemplateStorage templateStorage) {
 		Template template = new Template();
 		template.templateMaster = templateMaster;
+		template.templateFileStr = templateFileStr;
 		template.templateStorage = templateStorage;
 		template.load();
 		return template;
@@ -97,6 +116,7 @@ public class Template {
 	public synchronized boolean check_reload() {
 		boolean reloaded = false;
 		if ( templateStorage == null ) {
+			templateStorage = templateMaster.getTemplateStorage( templateFileStr );
 		}
 		if ( templateStorage != null ) {
 			templateStorage.checkReload();
@@ -290,8 +310,7 @@ public class Template {
 				case HtmlItem.T_DIRECTIVE:
 					html_items_work.remove( i );
 					++reductions;
-					// debug
-					System.out.println( "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
+					logger.log( Level.SEVERE, "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
 					break;
 				case HtmlItem.T_COMMENT:
 				case HtmlItem.T_EXCLAMATION:
@@ -354,7 +373,7 @@ public class Template {
 				htmlItem = html_items_work.get( i );
 				switch ( htmlItem.getType() ) {
 				case HtmlItem.T_DIRECTIVE:
-					System.out.println( "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
+					logger.log( Level.SEVERE, "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
 					break;
 				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
@@ -448,17 +467,6 @@ public class Template {
 		}
 
 		return templateParts;
-	}
-
-	/**
-	 * Internal class to keep track of <code>Place</code> tags in a master template.
-	 */
-	public class TemplateMasterPlace {
-
-		public String placeholderName = null;
-
-		public List<HtmlItem> htmlItems = new ArrayList<HtmlItem>();
-
 	}
 
 }

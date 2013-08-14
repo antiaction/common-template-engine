@@ -81,13 +81,13 @@ public class TemplateFileStorage implements TemplateStorage {
 					// Validate html. 
 					HtmlValidator.validate( html_items_cached );
 
-					logger.log( Level.FINE, "Template-loaded: " + templateFile.getCanonicalFile() );
+					logger.log( Level.INFO, "Template-loaded: " + templateFile.getAbsolutePath() );
 				}
 			}
 			else {
 				html_raw_bytes = null;
 				html_items_cached = null;
-				logger.log( Level.SEVERE, "Template missing: " + templateFile.getCanonicalFile() );
+				logger.log( Level.SEVERE, "Template missing: " + templateFile.getAbsolutePath() );
 			}
 		}
 		catch (IOException e) {

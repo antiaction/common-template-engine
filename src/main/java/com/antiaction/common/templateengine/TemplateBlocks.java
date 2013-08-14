@@ -24,6 +24,8 @@ public class TemplateBlocks {
 	 * Source template.
 	 */
 
+	protected String templateFileStr = null;
+
 	/** Template storage object. */
 	protected TemplateStorage templateStorage = null;
 
@@ -50,9 +52,10 @@ public class TemplateBlocks {
 	protected TemplateBlocks() {
 	}
 
-	public static TemplateBlocks getInstance(TemplateMaster templateMaster, TemplateStorage templateStorage) {
+	public static TemplateBlocks getInstance(TemplateMaster templateMaster, String templateFileStr, TemplateStorage templateStorage) {
 		TemplateBlocks template = new TemplateBlocks();
 		template.templateMaster = templateMaster;
+		template.templateFileStr = templateFileStr;
 		template.templateStorage = templateStorage;
 		template.load();
 		return template;
@@ -61,6 +64,7 @@ public class TemplateBlocks {
 	public boolean check_reload() {
 		boolean reloaded = false;
 		if ( templateStorage == null ) {
+			templateStorage = templateMaster.getTemplateStorage( templateFileStr );
 		}
 		if ( templateStorage != null ) {
 			templateStorage.checkReload();

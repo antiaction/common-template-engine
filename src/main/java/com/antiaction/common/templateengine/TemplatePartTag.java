@@ -10,10 +10,15 @@ package com.antiaction.common.templateengine;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.antiaction.common.html.HtmlItem;
 
 public class TemplatePartTag extends TemplatePartBase {
+
+    /** Logging mechanism. */
+	private static Logger logger = Logger.getLogger( TemplatePartTag.class.getName() );
 
 	private TemplatePartTag() {
 	}
@@ -69,7 +74,7 @@ public class TemplatePartTag extends TemplatePartBase {
 			bytes = getText().getBytes( "utf-8" );
 		}
 		catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.log( Level.SEVERE, e.toString(), e );
 		}
 		return bytes;
 	}
