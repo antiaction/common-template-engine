@@ -13,13 +13,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class TestTemplacePlaceHolder {
+public class TestTemplatePlaceHolder {
 
 	@Test
-	public void test_templaceplaceholder() {
+	public void test_templateplaceholder() {
 		TemplatePlaceHolder tplPlaceHolder;
 
-		tplPlaceHolder = TemplatePlaceHolder.getTemplatePlaceHolder( null );
+		tplPlaceHolder = TemplatePlaceBase.getTemplatePlaceHolder( null );
 
 		Assert.assertNotNull( tplPlaceHolder );
 		Assert.assertEquals( TemplatePlaceBase.PH_PLACEHOLDER, tplPlaceHolder.type );
@@ -28,7 +28,7 @@ public class TestTemplacePlaceHolder {
 		Assert.assertEquals( "placeholder", tplPlaceHolder.tagName );
 		Assert.assertNull( tplPlaceHolder.idName );
 
-		tplPlaceHolder = TemplatePlaceHolder.getTemplatePlaceHolder( "idName" );
+		tplPlaceHolder = TemplatePlaceBase.getTemplatePlaceHolder( "idName" );
 
 		Assert.assertNotNull( tplPlaceHolder );
 		Assert.assertEquals( TemplatePlaceBase.PH_PLACEHOLDER, tplPlaceHolder.type );

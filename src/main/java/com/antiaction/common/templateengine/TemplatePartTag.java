@@ -30,16 +30,6 @@ public class TemplatePartTag extends TemplatePartBase {
 	}
 
 	@Override
-	public void setText(String text) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setBytes(byte[] bytes) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getText() {
 		//return htmlItem.getText().getBytes();
 		StringBuffer sb = new StringBuffer();
@@ -68,15 +58,25 @@ public class TemplatePartTag extends TemplatePartBase {
 	}
 
 	@Override
+	public void setText(String text) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public byte[] getBytes() {
 		byte[] bytes = new byte[ 0 ];
 		try {
-			bytes = getText().getBytes( "utf-8" );
+			bytes = getText().getBytes( "UTF-8" );
 		}
 		catch (UnsupportedEncodingException e) {
 			logger.log( Level.SEVERE, e.toString(), e );
 		}
 		return bytes;
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		throw new UnsupportedOperationException();
 	}
 
 }

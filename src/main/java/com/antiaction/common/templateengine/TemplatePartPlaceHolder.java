@@ -32,22 +32,10 @@ public class TemplatePartPlaceHolder extends TemplatePartBase {
 	}
 
 	@Override
-	public void setText(String text) {
-		this.text = text;
-		bytes = null;
-	}
-
-	@Override
-	public void setBytes(byte[] bytes) {
-		this.bytes = bytes;
-		text = null;
-	}
-
-	@Override
 	public String getText() {
 		if ( text == null && bytes != null ) {
 			try {
-				text = new String( bytes, "utf-8" );
+				text = new String( bytes, "UTF-8" );
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.log( Level.SEVERE, e.toString(), e) ;
@@ -57,16 +45,28 @@ public class TemplatePartPlaceHolder extends TemplatePartBase {
 	}
 
 	@Override
+	public void setText(String text) {
+		this.text = text;
+		bytes = null;
+	}
+
+	@Override
 	public byte[] getBytes() {
 		if ( bytes == null && text != null ) {
 			try {
-				bytes = text.getBytes( "utf-8" );
+				bytes = text.getBytes( "UTF-8" );
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.log( Level.SEVERE, e.toString(), e );
 			}
 		}
 		return bytes;
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
+		text = null;
 	}
 
 }

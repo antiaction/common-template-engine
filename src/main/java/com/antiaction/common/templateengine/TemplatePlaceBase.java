@@ -15,6 +15,14 @@ public abstract class TemplatePlaceBase {
 
 	public static final int PH_PLACEHOLDER = 2;
 
+	public static TemplatePlaceTag getTemplatePlaceTag(String tagName, String idName) {
+		return TemplatePlaceTag.getInstance( tagName, idName );
+	}
+
+	public static TemplatePlaceHolder getTemplatePlaceHolder(String idName) {
+		return TemplatePlaceHolder.getInstance( idName );
+	}
+
 	public TemplatePartBase templatePart = null;
 
 	public HtmlItem htmlItem = null;
@@ -24,13 +32,5 @@ public abstract class TemplatePlaceBase {
 	public String tagName = null;
 
 	public String idName = null;
-
-	public static TemplatePlaceHolder getTemplatePlaceHolder(String idName) {
-		return TemplatePlaceHolder.getInstance( idName );
-	}
-
-	public static TemplatePlaceTag getTemplatePlaceTag(String tagName, String idName) {
-		return TemplatePlaceTag.getInstance( tagName, idName );
-	}
 
 }

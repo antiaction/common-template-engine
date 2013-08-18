@@ -32,26 +32,16 @@ public class TemplatePartStatic extends TemplatePartBase {
 
 	public static TemplatePartStatic getInstance(byte[] bytes) {
 		TemplatePartStatic part = new TemplatePartStatic();
-		part.bytes = bytes;
 		part.text = null;
+		part.bytes = bytes;
 		return part;
-	}
-
-	@Override
-	public void setText(String text) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setBytes(byte[] bytes) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getText() {
 		if ( text == null && bytes != null ) {
 			try {
-				text = new String( bytes, "utf-8" );
+				text = new String( bytes, "UTF-8" );
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.log( Level.SEVERE, e.toString(), e );
@@ -61,16 +51,26 @@ public class TemplatePartStatic extends TemplatePartBase {
 	}
 
 	@Override
+	public void setText(String text) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public byte[] getBytes() {
 		if ( bytes == null && text != null ) {
 			try {
-				bytes = text.getBytes( "utf-8" );
+				bytes = text.getBytes( "UTF-8" );
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.log( Level.SEVERE, e.toString(), e );
 			}
 		}
 		return bytes;
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		throw new UnsupportedOperationException();
 	}
 
 }

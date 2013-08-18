@@ -23,11 +23,11 @@ import com.antiaction.common.html.HtmlParser;
 public class TestTemplatePlaceTag {
 
 	@Test
-	public void test_templaceplacetag() {
+	public void test_templateplacetag() {
 		TemplatePlaceTag tplPlaceTag;
 
 		try {
-			tplPlaceTag = TemplatePlaceTag.getTemplatePlaceTag( null, null );
+			tplPlaceTag = TemplatePlaceBase.getTemplatePlaceTag( null, null );
 
 			Assert.assertNotNull( tplPlaceTag );
 			Assert.assertEquals( TemplatePlaceBase.PH_TAG, tplPlaceTag.type );
@@ -41,7 +41,7 @@ public class TestTemplatePlaceTag {
 			Assert.assertNull( tplPlaceTag.setAttribute( "name", "value" ) );
 			Assert.assertNull( tplPlaceTag.removeAttribute( "name" ) );
 
-			tplPlaceTag = TemplatePlaceTag.getTemplatePlaceTag( "tagName", "idName" );
+			tplPlaceTag = TemplatePlaceBase.getTemplatePlaceTag( "tagName", "idName" );
 
 			Assert.assertNotNull( tplPlaceTag );
 			Assert.assertEquals( TemplatePlaceBase.PH_TAG, tplPlaceTag.type );

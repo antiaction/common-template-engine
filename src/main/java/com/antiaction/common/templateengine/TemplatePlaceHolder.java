@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import com.antiaction.common.html.HtmlItem;
 import com.antiaction.common.html.HtmlParser;
-import com.antiaction.common.templateengine.storage.TemplateFileStorageManager;
 
 public class TemplatePlaceHolder extends TemplatePlaceBase {
 

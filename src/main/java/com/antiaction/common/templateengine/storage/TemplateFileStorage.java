@@ -67,7 +67,7 @@ public class TemplateFileStorage implements TemplateStorage {
 					last_file_length = templateFile.length();
 
 					is = new ByteArrayInputStream( html_raw_bytes );
-					reader = new InputStreamReader( is, "utf-8" );
+					reader = new InputStreamReader( is, "UTF-8" );
 
 					// Parse html into a List of html items.
 					HtmlParser htmlParser = new HtmlParser();
@@ -78,7 +78,7 @@ public class TemplateFileStorage implements TemplateStorage {
 					is.close();
 					is = null;
 
-					// Validate html. 
+					// Validate html.
 					HtmlValidator.validate( html_items_cached );
 
 					logger.log( Level.INFO, "Template-loaded: " + templateFile.getAbsolutePath() );

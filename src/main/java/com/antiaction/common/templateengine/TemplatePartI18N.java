@@ -35,7 +35,7 @@ public class TemplatePartI18N extends TemplatePartBase {
 			// TODO language translation
 			part.text = part.text_id;
 			try {
-				part.bytes = part.text.getBytes( "utf-8" );
+				part.bytes = part.text.getBytes( "UTF-8" );
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.log( Level.SEVERE, e.toString(), e );
@@ -45,23 +45,23 @@ public class TemplatePartI18N extends TemplatePartBase {
 	}
 
 	@Override
-	public void setText(String text) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setBytes(byte[] bytes) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getText() {
 		return text;
 	}
 
 	@Override
+	public void setText(String text) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public byte[] getBytes() {
 		return bytes;
+	}
+
+	@Override
+	public void setBytes(byte[] bytes) {
+		throw new UnsupportedOperationException();
 	}
 
 }
