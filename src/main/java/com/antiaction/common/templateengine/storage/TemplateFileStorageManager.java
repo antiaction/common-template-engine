@@ -58,6 +58,7 @@ public class TemplateFileStorageManager implements TemplateStorageManager {
 				File templateFile = new File( templatePath, templateFileStr );
 				if ( templateFile.exists() && templateFile.isFile() ) {
 					tplStor = new TemplateFileStorage( templateFile );
+					storageMap.put( templateFileStr, tplStor );
 				}
 				else {
 					logger.log( Level.SEVERE, "Template missing: " + templateFile.getAbsolutePath() );
