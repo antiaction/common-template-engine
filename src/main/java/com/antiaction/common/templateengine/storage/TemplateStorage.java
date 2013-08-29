@@ -15,7 +15,7 @@ public interface TemplateStorage {
 
 	public boolean exists();
 
-	public void checkReload();
+	public boolean checkReload();
 
 	public long lastModified();
 

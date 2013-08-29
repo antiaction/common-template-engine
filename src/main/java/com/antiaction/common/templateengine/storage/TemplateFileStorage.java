@@ -50,7 +50,8 @@ public class TemplateFileStorage implements TemplateStorage {
 	}
 
 	@Override
-	public synchronized void checkReload() {
+	public synchronized boolean checkReload() {
+		boolean reloaded = false;
 		RandomAccessFile ram = null;
 		ByteArrayInputStream is = null;
 		InputStreamReader reader = null;
@@ -80,6 +81,8 @@ public class TemplateFileStorage implements TemplateStorage {
 
 					// Validate html.
 					HtmlValidator.validate( html_items_cached );
+
+					reloaded = true;
 
 					logger.log( Level.INFO, "Template-loaded: " + templateFile.getAbsolutePath() );
 				}
@@ -125,6 +128,7 @@ public class TemplateFileStorage implements TemplateStorage {
 				is = null;
 			}
 		}
+		return reloaded;
 	}
 
 	@Override

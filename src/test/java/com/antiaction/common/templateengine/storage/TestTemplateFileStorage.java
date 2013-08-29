@@ -74,7 +74,7 @@ public class TestTemplateFileStorage {
 			Assert.assertEquals( tplStor.last_file_length, tplStor.length() );
 			Assert.assertEquals( tplStor.html_items_cached, htmlItems );
 
-			tplStor.checkReload();
+			Assert.assertFalse( tplStor.checkReload() );
 
 			Assert.assertTrue( tplStor.exists() );
 
@@ -95,7 +95,7 @@ public class TestTemplateFileStorage {
 			raf.write( "templatefile new".getBytes() );
 			raf.close();
 
-			tplStor.checkReload();
+			Assert.assertTrue( tplStor.checkReload() );
 
 			Assert.assertTrue( tplStor.exists() );
 
@@ -121,7 +121,7 @@ public class TestTemplateFileStorage {
 
 			templateFile.setLastModified( last_modified );
 
-			tplStor.checkReload();
+			Assert.assertTrue( tplStor.checkReload() );
 
 			Assert.assertTrue( tplStor.exists() );
 
@@ -158,7 +158,7 @@ public class TestTemplateFileStorage {
 			/*
 			 * checkReload no file.
 			 */
-			tplStor.checkReload();
+			Assert.assertFalse( tplStor.checkReload() );
 
 			Assert.assertFalse( tplStor.exists() );
 
@@ -176,7 +176,7 @@ public class TestTemplateFileStorage {
 			 */
 			templateFile.mkdir();
 
-			tplStor.checkReload();
+			Assert.assertFalse( tplStor.checkReload() );
 
 			Assert.assertFalse( tplStor.exists() );
 

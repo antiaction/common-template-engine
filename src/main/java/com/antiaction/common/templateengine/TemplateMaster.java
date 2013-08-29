@@ -9,8 +9,10 @@ package com.antiaction.common.templateengine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.antiaction.common.templateengine.storage.TemplateStorage;
 import com.antiaction.common.templateengine.storage.TemplateStorageManager;
@@ -27,6 +29,8 @@ public class TemplateMaster {
 
 	/** <code>TemplateMaster</code> singleton instance. */
 	protected static Map<String, TemplateMaster> templateMasterMap = new HashMap<String, TemplateMaster>();
+
+	protected Set<TemplateStorageManager> templateStorageManagerSet = new HashSet<TemplateStorageManager>();
 
 	protected List<TemplateStorageManager> templateStorageManagerList = new ArrayList<TemplateStorageManager>();
 
@@ -67,8 +71,13 @@ public class TemplateMaster {
 	}
 
 	public void addTemplateStorage(TemplateStorageManager tplStorMan) {
-		synchronized ( templateStorageManagerList ) {
-			templateStorageManagerList.add( tplStorMan );
+		synchronized ( templateStorageManagerSet ) {
+			if ( !templateStorageManagerSet.contains( tplStorMan ) ) {
+				templateStorageManagerSet.add( tplStorMan );
+				synchronized ( templateStorageManagerList ) {
+					templateStorageManagerList.add( tplStorMan );
+				}
+			}
 		}
 	}
 

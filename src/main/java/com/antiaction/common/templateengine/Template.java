@@ -69,7 +69,7 @@ public class Template {
 
 	}
 
-	protected long masterProcessedTS;
+	protected long last_processed;
 
 	/** Master template. */
 	protected Template master = null;
@@ -119,19 +119,21 @@ public class Template {
 			templateStorage = templateMaster.getTemplateStorage( templateFileStr );
 		}
 		if ( templateStorage != null ) {
-			templateStorage.checkReload();
-			if ( last_modified != templateStorage.lastModified() || last_file_length != templateStorage.length() ) {
+			if ( templateStorage.checkReload() || last_modified != templateStorage.lastModified() || last_file_length != templateStorage.length() ) {
 				reload();
 				reloaded = true;
 			}
 			if ( master != null ) {
-				if ( master.check_reload() || master.last_modified > masterProcessedTS ) {
+				if ( master.check_reload() || master.last_processed > last_processed ) {
 					html_items_work = null;
 					reloaded = true;
 				}
 				if ( reloaded ) {
 					master_process();
 				}
+			}
+			if ( reloaded ) {
+				last_processed = System.currentTimeMillis();
 			}
 			if ( html_items_work == null && html_items_cached != null ) {
 				html_items_work = new ArrayList<HtmlItem>( html_items_cached );
@@ -148,6 +150,7 @@ public class Template {
 		if ( master != null ) {
 			master.check_reload();
 			master_process();
+			last_processed = System.currentTimeMillis();
 		}
 		if ( html_items_work == null && html_items_cached != null ) {
 			html_items_work = new ArrayList<HtmlItem>( html_items_cached );
@@ -274,7 +277,6 @@ public class Template {
 				}
 				--idx;
 			}
-			masterProcessedTS = System.currentTimeMillis();
 		}
 	}
 
