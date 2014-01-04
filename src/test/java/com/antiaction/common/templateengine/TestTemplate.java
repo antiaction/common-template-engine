@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -18,8 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.antiaction.common.html.HtmlItem;
 import com.antiaction.common.templateengine.storage.TemplateFileStorageManager;
-import com.antiaction.common.templateengine.storage.TemplateStorage;
 import com.antiaction.common.templateengine.storage.TemplateStorageManager;
 
 @RunWith(JUnit4.class)
@@ -170,6 +173,214 @@ public class TestTemplate {
 			Assert.assertTrue( child1b_tpl.check_reload() );
 			Assert.assertFalse( child1a_tpl.check_reload() );
 			Assert.assertFalse( master_tpl.check_reload() );
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail( "Unexpected exception!" );
+		}
+	}
+
+	@Test
+	public void test_template_prepare() {
+		URL url;
+		File file;
+		url = this.getClass().getClassLoader().getResource("");
+		file = new File(getUrlPath(url));
+
+		try {
+			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+			TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
+			tplMaster.addTemplateStorage( tplStorMan );
+
+			String template;
+			File templateFile;
+
+			Template template_tpl;
+			List<HtmlItem> htmlItems;
+			int idx;
+			int reductions;
+			Object[][] expected;
+
+			/*
+			 * No template.
+			 */
+
+			template_tpl = tplMaster.getTemplate( "unknown.html" );
+
+			htmlItems = template_tpl.getHtmlItems();
+			Assert.assertNull( htmlItems );
+
+			reductions = template_tpl.reduce( null );
+			Assert.assertEquals( 0, reductions );
+
+			reductions = template_tpl.reduce( null );
+			Assert.assertEquals( 0, reductions );
+
+			/*
+			 * No tags.
+			 */
+
+			template = "<@hola>";
+			template += "<html lang=\"en\">";
+			template += "<!-- comment -->";
+			template += "<!exclamation!>";
+			template += "<?processing?>";
+			template += "<input name=\"1\" />";
+			template += "<input name=\"2\" />";
+			template += "<input id=\"3\" />";
+			template += "<input id=\"4\" />";
+			template += "<a name=\"5\">";
+			template += "<a id=\"6\">";
+			template += "templatemaster";
+			template += "<i18n text_id=\"id\" />";
+			template += "<placeholder id=\"ph1\" />";
+			template += "<placeholder id=\"ph2\" />";
+			template += "</html>";
+			template += "<placeholder id=\"ph3\" />";
+
+			templateFile = new File( file, "templatepreparefile.html" );
+			saveBytes( templateFile, template.getBytes() );
+
+			template_tpl = tplMaster.getTemplate( "templatepreparefile.html" );
+
+			expected = new Object[][] {
+					//{ HtmlItem.T_DIRECTIVE, "<@hola>" },
+					{ HtmlItem.T_DIRECTIVE, null },
+					{ HtmlItem.T_TAG, "<html lang=\"en\">" },
+					{ HtmlItem.T_COMMENT, "<!-- comment -->" },
+					{ HtmlItem.T_EXCLAMATION, "<!exclamation!>" },
+					{ HtmlItem.T_PROCESSING, "<?processing?>" },
+					{ HtmlItem.T_TAG, "<input name=\"1\" />" },
+					{ HtmlItem.T_TAG, "<input name=\"2\" />" },
+					{ HtmlItem.T_TAG, "<input id=\"3\" />" },
+					{ HtmlItem.T_TAG, "<input id=\"4\" />" },
+					{ HtmlItem.T_TAG, "<a name=\"5\">" },
+					{ HtmlItem.T_TAG, "<a id=\"6\">" },
+					{ HtmlItem.T_TEXT, "templatemaster" },
+					{ HtmlItem.T_TAG, "<i18n text_id=\"id\" />"},
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph1\" />" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph2\" />" },
+					{ HtmlItem.T_ENDTAG, "</html>" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph3\" />" }
+			};
+
+			htmlItems = template_tpl.getHtmlItems();
+
+			Assert.assertEquals( expected.length, htmlItems.size() );
+			for ( int i=0; i<expected.length; ++i ) {
+				Assert.assertEquals( expected[ i ][ 0 ], htmlItems.get( i ).getType() );
+				Assert.assertEquals( expected[ i ][ 1 ], htmlItems.get( i ).getText() );
+			}
+
+			reductions = template_tpl.reduce( null );
+			Assert.assertEquals( 13, reductions );
+
+			reductions = template_tpl.reduce( null );
+			Assert.assertEquals( 2, reductions );
+
+			expected = new Object[][] {
+					{ HtmlItem.T_TEXT, "<html lang=\"en\"><!-- comment --><!exclamation!><?processing?><input name=\"1\" /><input name=\"2\" /><input id=\"3\" /><input id=\"4\" /><a name=\"5\"><a id=\"6\">templatemaster" },
+					{ HtmlItem.T_TAG, "<i18n text_id=\"id\" />"},
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph1\" />" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph2\" />" },
+					{ HtmlItem.T_TEXT, "</html>" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph3\" />" }
+			};
+
+			htmlItems = template_tpl.getHtmlItems();
+			Assert.assertEquals( expected.length, htmlItems.size() );
+			for ( int i=0; i<expected.length; ++i ) {
+				Assert.assertEquals( expected[ i ][ 0 ], htmlItems.get( i ).getType() );
+				Assert.assertEquals( expected[ i ][ 1 ], htmlItems.get( i ).getText() );
+			}
+
+			/*
+			 * Tags.
+			 */
+
+			template = "<html lang=\"en\">";
+			template += "<!-- comment -->";
+			template += "<!exclamation!>";
+			template += "<?processing?>";
+			template += "<input name=\"1\" />";
+			template += "<input name=\"2\" />";
+			template += "<input id=\"3\" />";
+			template += "<input id=\"4\" />";
+			template += "<a name=\"5\">";
+			template += "<a id=\"6\">";
+			template += "templatemaster";
+			template += "<i18n text_id=\"id\" />";
+			template += "<placeholder id=\"ph1\" />";
+			template += "<placeholder id=\"ph2\" />";
+			template += "</html>";
+
+			templateFile = new File( file, "templatepreparefile.html" );
+			saveBytes( templateFile, template.getBytes() );
+
+			template_tpl = tplMaster.getTemplate( "templatepreparefile.html" );
+
+			expected = new Object[][] {
+					{ HtmlItem.T_TAG, "<html lang=\"en\">" },
+					{ HtmlItem.T_COMMENT, "<!-- comment -->" },
+					{ HtmlItem.T_EXCLAMATION, "<!exclamation!>" },
+					{ HtmlItem.T_PROCESSING, "<?processing?>" },
+					{ HtmlItem.T_TAG, "<input name=\"1\" />" },
+					{ HtmlItem.T_TAG, "<input name=\"2\" />" },
+					{ HtmlItem.T_TAG, "<input id=\"3\" />" },
+					{ HtmlItem.T_TAG, "<input id=\"4\" />" },
+					{ HtmlItem.T_TAG, "<a name=\"5\">" },
+					{ HtmlItem.T_TAG, "<a id=\"6\">" },
+					{ HtmlItem.T_TEXT, "templatemaster" },
+					{ HtmlItem.T_TAG, "<i18n text_id=\"id\" />"},
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph1\" />" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph2\" />" },
+					{ HtmlItem.T_ENDTAG, "</html>" }
+			};
+
+			htmlItems = template_tpl.getHtmlItems();
+
+			Assert.assertEquals( expected.length, htmlItems.size() );
+			for ( int i=0; i<expected.length; ++i ) {
+				Assert.assertEquals( expected[ i ][ 0 ], htmlItems.get( i ).getType() );
+				Assert.assertEquals( expected[ i ][ 1 ], htmlItems.get( i ).getText() );
+			}
+
+			String[][] tagIdNameArr = {
+					{},
+					{"a"},
+					{"input", "1", "3" },
+					{"a"},
+					{"input", "1", "3" }
+			};
+			Map<String, Set<String>> tagMap = template_tpl.buildTagMap( tagIdNameArr );
+
+			reductions = template_tpl.reduce( tagMap );
+			Assert.assertEquals( 8, reductions );
+
+			reductions = template_tpl.reduce( tagMap );
+			Assert.assertEquals( 5, reductions );
+
+			expected = new Object[][] {
+					{ HtmlItem.T_TEXT, "<html lang=\"en\"><!-- comment --><!exclamation!><?processing?>" },
+					{ HtmlItem.T_TAG, "<input name=\"1\" />" },
+					{ HtmlItem.T_TEXT, "<input name=\"2\" />" },
+					{ HtmlItem.T_TAG, "<input id=\"3\" />" },
+					{ HtmlItem.T_TEXT, "<input id=\"4\" />" },
+					{ HtmlItem.T_TAG, "<a name=\"5\">" },
+					{ HtmlItem.T_TAG, "<a id=\"6\">" },
+					{ HtmlItem.T_TEXT, "templatemaster" },
+					{ HtmlItem.T_TAG, "<i18n text_id=\"id\" />"},
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph1\" />" },
+					{ HtmlItem.T_TAG, "<placeholder id=\"ph2\" />" },
+					{ HtmlItem.T_TEXT, "</html>" }
+			};
+
+			htmlItems = template_tpl.getHtmlItems();
+			Assert.assertEquals( expected.length, htmlItems.size() );
+			for ( int i=0; i<expected.length; ++i ) {
+				Assert.assertEquals( expected[ i ][ 0 ], htmlItems.get( i ).getType() );
+				Assert.assertEquals( expected[ i ][ 1 ], htmlItems.get( i ).getText() );
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();

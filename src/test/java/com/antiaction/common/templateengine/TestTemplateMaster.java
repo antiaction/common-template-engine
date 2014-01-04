@@ -32,6 +32,14 @@ public class TestTemplateMaster {
 		return path;
 	}
 
+	public static void deleteFile(File file) throws IOException {
+		if ( file.exists() ) {
+			if ( !file.delete() ) {
+				Assert.fail( "Unable to delete file!" );
+			}
+		}
+	}
+
 	public static void saveBytes(File file, byte[] bytes) throws IOException {
 		if ( file.exists() ) {
 			if ( !file.delete() ) {
@@ -76,6 +84,14 @@ public class TestTemplateMaster {
 
 		tplStor = tplMaster.getTemplateStorage( "missing.html" );
 		Assert.assertNull( tplStor );
+
+		/*
+		<html>
+		templatefile
+		<placeholder id="ph1" />
+		</html>
+		*/
+
 		tplStor = tplMaster.getTemplateStorage( "templatefile.html" );
 		Assert.assertNotNull( tplStor );
 	}

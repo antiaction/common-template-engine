@@ -22,6 +22,7 @@ public class TemplatePreprocessor {
     /** Logging mechanism. */
 	private static Logger logger = Logger.getLogger( TemplatePreprocessor.class.getName() );
 
+	/** Backing template. */
 	protected Template template;
 
 	protected Set<String> variables;
@@ -69,6 +70,13 @@ public class TemplatePreprocessor {
 				switch ( htmlItem.getType() ) {
 				case HtmlItem.T_DIRECTIVE:
 					logger.log( Level.SEVERE, "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
+					break;
+				case HtmlItem.T_PROCESSING:
+				case HtmlItem.T_EXCLAMATION:
+				case HtmlItem.T_COMMENT:
+				case HtmlItem.T_ENDTAG:
+				case HtmlItem.T_TEXT:
+					out.write( htmlItem.getText().getBytes( character_encoding ) );
 					break;
 				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
@@ -142,13 +150,6 @@ public class TemplatePreprocessor {
 					else {
 						out.write( htmlItem.getText().getBytes( character_encoding ) );
 					}
-					break;
-				case HtmlItem.T_ENDTAG:
-				case HtmlItem.T_TEXT:
-				case HtmlItem.T_PROCESSING:
-				case HtmlItem.T_EXCLAMATION:
-				case HtmlItem.T_COMMENT:
-					out.write( htmlItem.getText().getBytes( character_encoding ) );
 					break;
 				}
 				++i;

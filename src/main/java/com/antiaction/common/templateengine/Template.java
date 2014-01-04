@@ -24,7 +24,7 @@ import com.antiaction.common.html.HtmlText;
 import com.antiaction.common.templateengine.storage.TemplateStorage;
 
 /**
- * Thread-safe as long as check_reload() is the only method used externally.
+ * Thread-safe as long as only public methods are used.
  *
  * @author Nicholas
  */
@@ -40,6 +40,7 @@ public class Template {
 	 * Source template.
 	 */
 
+	/** Template storage filename/id string. */
 	protected String templateFileStr = null;
 
 	/** Template storage object. */
@@ -69,6 +70,7 @@ public class Template {
 
 	}
 
+	/** Last time this template was changed. */
 	protected long last_processed;
 
 	/** Master template. */
@@ -159,7 +161,7 @@ public class Template {
 
 	/**
 	 * Load or reload a template file parsing and splitting it into <code>HtmlItem</code >sub-parts.
-	 * Also makes call to check for use of master page.
+	 * Also makes a call to check for the use of a master page.
 	 * TODO detect character encoding before turning into String internally.
 	 */
 	protected void reload() {
@@ -185,7 +187,7 @@ public class Template {
 	}
 
 	/**
-	 * Process list of <code>HtmlItem</code> objects to check for use of a master file.
+	 * Process list of <code>HtmlItem</code> objects to check for the use of a master file.
 	 * If there is a master this templates content is copied into separate template master places.
 	 */
 	protected void check_master_use() {
@@ -280,33 +282,56 @@ public class Template {
 		}
 	}
 
-	public List<HtmlItem> getHtmlItems() {
+	/**
+	 * Returns this templates list of <code>HtmlItem</code> objects.
+	 * @return this templates list of <code>HtmlItem</code> objects
+	 */
+	public synchronized List<HtmlItem> getHtmlItems() {
 		return html_items_work;
 	}
 
 	/**
 	 * 
-	 * @param tagnameList
+	 * @param tagIdNameArr
 	 * @return
 	 */
-	public int prepare(List<String> tagnameList) {
-		Set<String> tagnameSet = new HashSet<String>();
-		if ( tagnameList != null ) {
-			for ( int i=0; i<tagnameList.size(); ++i ) {
-				tagnameSet.add( tagnameList.get( i ).toLowerCase() );
+	public static Map<String, Set<String>> buildTagMap(String[][] tagIdNameArr) {
+		Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>();
+		Set<String> idNameSet;
+		String[] strArr;
+		for ( int i=0; i<tagIdNameArr.length; ++i ) {
+			strArr = tagIdNameArr[ i ];
+			if ( strArr.length > 0 ) {
+				idNameSet = tagMap.get( strArr[ 0 ] );
+				if ( idNameSet == null ) {
+					idNameSet = new HashSet<String>();
+					tagMap.put( strArr[ 0 ], idNameSet );
+				}
+				for ( int j=1; j<strArr.length; ++j ) {
+					idNameSet.add( strArr[ j ] );
+				}
 			}
 		}
+		return tagMap;
+	}
 
+	/**
+	 * 
+	 * @param tagMap
+	 * @return
+	 */
+	public synchronized int reduce(Map<String, Set<String>> tagMap) {
 		HtmlItem htmlItem;
+		boolean bKeep;
 		String tagName;
-
+		Set<String> idNameSet;
+		String id;
+		String name;
+		StringBuilder sb = new StringBuilder();
 		int reductions = 0;
-
-		StringBuffer sb = new StringBuffer();
-
 		if ( html_items_work != null ) {
 			int i = 0;
-			while ( i<html_items_work.size() ) {
+			while ( i < html_items_work.size() ) {
 				htmlItem = html_items_work.get( i );
 				switch ( htmlItem.getType() ) {
 				case HtmlItem.T_DIRECTIVE:
@@ -325,7 +350,32 @@ public class Template {
 					break;
 				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
-					if ( "i18n".compareTo( tagName ) == 0 || "placeholder".compareTo( tagName ) == 0 || tagnameSet.contains( tagName ) ) {
+					bKeep = false;
+					if ( "i18n".compareTo( tagName ) == 0 || "placeholder".compareTo( tagName ) == 0 ) {
+						bKeep = true;
+					}
+					else if ( tagMap != null ) {
+						idNameSet = tagMap.get( tagName );
+						if ( idNameSet != null ) {
+							if (  idNameSet.size() == 0  ) {
+								bKeep = true;
+							}
+							else {
+								name = htmlItem.getAttribute( "name" );
+								if ( name != null && idNameSet.contains( name ) ) {
+									bKeep = true;
+								}
+								else {
+									id = htmlItem.getAttribute( "id" );
+									if ( id != null && idNameSet.contains( id ) ) {
+										bKeep = true;
+									}
+								}
+							}
+							
+						}
+					}
+					if ( bKeep ) {
 						if ( sb.length() > 0 ) {
 							html_items_work.add( i, new HtmlText( sb.toString() ) );
 							sb.setLength( 0 );
@@ -351,7 +401,7 @@ public class Template {
 	}
 
 	// Check for valid character encoding and cache per encoding.
-	public TemplateParts filterTemplate(List<TemplatePlaceBase> placeHolders, String character_encoding) throws UnsupportedEncodingException, IOException {
+	public synchronized TemplateParts filterTemplate(List<TemplatePlaceBase> placeHolders, String character_encoding) throws UnsupportedEncodingException, IOException {
 		TemplateParts templateParts = new TemplateParts();
 
 		String tagName;
@@ -376,6 +426,13 @@ public class Template {
 				switch ( htmlItem.getType() ) {
 				case HtmlItem.T_DIRECTIVE:
 					logger.log( Level.SEVERE, "Invalid @directive: " + htmlItem.getTagname().toLowerCase() );
+					break;
+				case HtmlItem.T_COMMENT:
+				case HtmlItem.T_EXCLAMATION:
+				case HtmlItem.T_PROCESSING:
+				case HtmlItem.T_ENDTAG:
+				case HtmlItem.T_TEXT:
+					out.write( htmlItem.getText().getBytes( character_encoding ) );
 					break;
 				case HtmlItem.T_TAG:
 					tagName = htmlItem.getTagname().toLowerCase();
@@ -449,13 +506,6 @@ public class Template {
 					else {
 						out.write( htmlItem.getText().getBytes( character_encoding ) );
 					}
-					break;
-				case HtmlItem.T_ENDTAG:
-				case HtmlItem.T_TEXT:
-				case HtmlItem.T_PROCESSING:
-				case HtmlItem.T_EXCLAMATION:
-				case HtmlItem.T_COMMENT:
-					out.write( htmlItem.getText().getBytes( character_encoding ) );
 					break;
 				}
 				++i;

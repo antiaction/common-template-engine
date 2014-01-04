@@ -39,7 +39,7 @@ public class TestTemplateFileStorage {
 
 		URL url;
 		File file;
-		url = this.getClass().getClassLoader().getResource("templatefile.html");
+		url = this.getClass().getClassLoader().getResource("");
 		file = new File(getUrlPath(url));
 
 		try {
