@@ -1,5 +1,5 @@
 /*
- * Created on 28/08/2013
+ * Created on 07/06/2014
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -9,10 +9,12 @@ package com.antiaction.common.templateengine;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -21,7 +23,7 @@ import com.antiaction.common.templateengine.storage.TemplateFileStorageManager;
 import com.antiaction.common.templateengine.storage.TemplateStorageManager;
 
 @RunWith(JUnit4.class)
-public class TestTemplateBlocks {
+public class TestTemplatePreprocessor {
 
 	public static String getUrlPath(URL url) {
 		String path = url.getFile();
@@ -30,21 +32,9 @@ public class TestTemplateBlocks {
 		return path;
 	}
 
-	public static void saveBytes(File file, byte[] bytes) throws IOException {
-		if ( file.exists() ) {
-			if ( !file.delete() ) {
-				Assert.fail( "Unable to delete file!" );
-			}
-		}
-		RandomAccessFile raf = new RandomAccessFile( file, "rw" );
-		raf.seek( 0L );
-		raf.setLength( 0L );
-		raf.write( bytes );
-		raf.close();
-	}
-
 	@Test
-	public void test_templateblocks() {
+	@Ignore
+	public void test_templatepreprocessor() {
 		URL url;
 		File file;
 		url = this.getClass().getClassLoader().getResource("");
@@ -53,6 +43,21 @@ public class TestTemplateBlocks {
 		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 		TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
 		tplMaster.addTemplateStorage( tplStorMan );
+
+		try {
+			TemplatePreprocessor tplPp = tplMaster.getTemplatePreprocessor( "templatefile.html", new HashMap<String, Set<String>>() );
+			Assert.assertNotNull( tplPp );
+
+			Template tpl = tplMaster.getTemplate( "templatefile.html" );
+			Assert.assertNotNull( tpl );
+
+			Assert.assertEquals( tplPp.getTemplate(), tpl );
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail( "Unexpected exception!" );
+		}
+
 	}
 
 }

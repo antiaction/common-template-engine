@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -55,7 +54,7 @@ public class TestTemplate {
 		url = this.getClass().getClassLoader().getResource("");
 		file = new File(getUrlPath(url));
 
-		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 		TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
 		tplMaster.addTemplateStorage( tplStorMan );
 
@@ -90,7 +89,7 @@ public class TestTemplate {
 		file = new File(getUrlPath(url));
 
 		try {
-			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 			TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
 			tplMaster.addTemplateStorage( tplStorMan );
 
@@ -188,7 +187,7 @@ public class TestTemplate {
 		file = new File(getUrlPath(url));
 
 		try {
-			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 			TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
 			tplMaster.addTemplateStorage( tplStorMan );
 

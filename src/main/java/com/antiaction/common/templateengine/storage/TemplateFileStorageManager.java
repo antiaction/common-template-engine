@@ -24,6 +24,8 @@ public class TemplateFileStorageManager implements TemplateStorageManager {
 	/** Path to root of template files. */
 	protected File templatePath = null;
 
+	protected String charsetName;
+
 	/** Map of cached <code>TemplateStorage</code> instances. */
 	protected Map<String, TemplateFileStorage> storageMap = new HashMap<String, TemplateFileStorage>();
 
@@ -40,11 +42,12 @@ public class TemplateFileStorageManager implements TemplateStorageManager {
 	 * @param templatePath path to root of template files
 	 * @return <code>TemplateFileStorage</code> instance
 	 */
-	public static synchronized TemplateStorageManager getInstance(String templatePath) {
+	public static synchronized TemplateStorageManager getInstance(String templatePath, String charsetName) {
 		TemplateFileStorageManager tplStorMan = pathMap.get( templatePath );
 		if ( tplStorMan == null ) {
 			tplStorMan = new TemplateFileStorageManager();
 			tplStorMan.templatePath = new File( templatePath );
+			tplStorMan.charsetName = charsetName;
 			pathMap.put( templatePath, tplStorMan );
 		}
 		return tplStorMan;
@@ -57,7 +60,7 @@ public class TemplateFileStorageManager implements TemplateStorageManager {
 			if ( tplStor == null ) {
 				File templateFile = new File( templatePath, templateFileStr );
 				if ( templateFile.exists() && templateFile.isFile() ) {
-					tplStor = new TemplateFileStorage( templateFile );
+					tplStor = new TemplateFileStorage( templateFile, charsetName );
 					storageMap.put( templateFileStr, tplStor );
 				}
 				else {

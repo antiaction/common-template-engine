@@ -35,13 +35,13 @@ public class TestTemplateFileStorageManager {
 		String dir1 = new File( file, "dir1" ).getPath();
 		String dir2 = new File( file, "dir2" ).getPath();
 
-		TemplateStorageManager tplStorMan1a = TemplateFileStorageManager.getInstance( dir1 );
+		TemplateStorageManager tplStorMan1a = TemplateFileStorageManager.getInstance( dir1, "UTF-8" );
 		Assert.assertNotNull( tplStorMan1a );
-		TemplateStorageManager tplStorMan2a = TemplateFileStorageManager.getInstance( dir2 );
+		TemplateStorageManager tplStorMan2a = TemplateFileStorageManager.getInstance( dir2, "UTF-8" );
 		Assert.assertNotNull( tplStorMan2a );
-		TemplateStorageManager tplStorMan1b = TemplateFileStorageManager.getInstance( dir1 );
+		TemplateStorageManager tplStorMan1b = TemplateFileStorageManager.getInstance( dir1, "UTF-8" );
 		Assert.assertNotNull( tplStorMan1b );
-		TemplateStorageManager tplStorMan2b = TemplateFileStorageManager.getInstance( dir2 );
+		TemplateStorageManager tplStorMan2b = TemplateFileStorageManager.getInstance( dir2, "UTF-8" );
 		Assert.assertNotNull( tplStorMan2b );
 
 		Assert.assertEquals( tplStorMan1a, tplStorMan1b );
@@ -64,7 +64,7 @@ public class TestTemplateFileStorageManager {
 		Assert.assertNull( tplStorMan2a.getTemplateStorage( "template.html" ) );
 		Assert.assertNull( tplStorMan2b.getTemplateStorage( "template.html" ) );
 
-		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 		Assert.assertNotNull( tplStorMan );
 		Assert.assertNull( tplStorMan.getTemplateStorage( "dir1" ) );
 		Assert.assertNull( tplStorMan.getTemplateStorage( "dir2" ) );

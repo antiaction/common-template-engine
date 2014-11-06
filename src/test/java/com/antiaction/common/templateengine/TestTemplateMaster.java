@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -65,7 +64,7 @@ public class TestTemplateMaster {
 		 */
 		TemplateStorage tplStor;
 
-		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath() );
+		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 		Assert.assertNotNull( tplStorMan );
 
 		//Assert.assertEquals( 0, TemplateMaster.templateMasterMap.size() );

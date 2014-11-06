@@ -55,7 +55,7 @@ public class TestTemplateFileStorage {
 			/*
 			 * File.
 			 */
-			TemplateFileStorage tplStor = new TemplateFileStorage( templateFile );
+			TemplateFileStorage tplStor = new TemplateFileStorage( templateFile, "UTF-8" );
 			Assert.assertNotNull( tplStor );
 
 			Assert.assertTrue( tplStor.exists() );
@@ -95,6 +95,7 @@ public class TestTemplateFileStorage {
 			raf.write( "templatefile new".getBytes() );
 			raf.close();
 
+			// TODO periodic failures
 			Assert.assertTrue( tplStor.checkReload() );
 
 			Assert.assertTrue( tplStor.exists() );

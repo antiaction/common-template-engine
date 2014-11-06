@@ -90,7 +90,7 @@ public class Template {
 	protected List<HtmlItem> html_items_work = null;
 
 	/**
-	 * Prevent creation of identical instances.
+	 * Prevent external construction.
 	 */
 	protected Template() {
 	}

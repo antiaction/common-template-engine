@@ -7,6 +7,7 @@
 
 package com.antiaction.common.templateengine;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,6 +113,15 @@ public class TemplateMaster {
 			}
 			return template;
 		}
+	}
+
+	public TemplatePreprocessor getTemplatePreprocessor(String templateFileStr, Map<String, Set<String>> keepers) throws IOException {
+		Template tpl = getTemplate( templateFileStr );
+		TemplatePreprocessor tplPp = null;
+		if ( tpl != null ) {
+			tplPp = TemplatePreprocessor.getInstance( tpl, keepers );
+		}
+		return tplPp;
 	}
 
 	/**

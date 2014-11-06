@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +26,27 @@ public class TemplatePreprocessor {
 	/** Backing template. */
 	protected Template template;
 
-	protected Set<String> variables;
+	protected Map<String, Set<String>> keepers;
 
-	public TemplatePreprocessor(Template template, Set<String> variables) {
-		this.template = template;
-		this.variables = variables;
+	/**
+	 * Prevent external construction.
+	 */
+	protected TemplatePreprocessor() {
 	}
 
-	public synchronized boolean check_reload() throws UnsupportedEncodingException, IOException {
+	public static TemplatePreprocessor getInstance(Template template, Map<String, Set<String>> keepers) throws IOException {
+		TemplatePreprocessor tplPp = new TemplatePreprocessor();
+		tplPp.template = template;
+		tplPp.keepers = keepers;
+		tplPp.reload();
+		return tplPp;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
+
+	public synchronized boolean check_reload() throws IOException {
 		boolean reloaded = template.check_reload();
 		if ( reloaded ) {
 			reload();
@@ -40,7 +54,7 @@ public class TemplatePreprocessor {
 		return reloaded;
 	}
 
-	public void reload() throws UnsupportedEncodingException, IOException {
+	public void reload() throws IOException {
 		List<HtmlItem> html_items_work = template.getHtmlItems();
 
 		TemplateParts templateParts = new TemplateParts();

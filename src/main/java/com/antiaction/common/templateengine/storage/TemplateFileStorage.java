@@ -27,6 +27,8 @@ public class TemplateFileStorage implements TemplateStorage {
 
 	protected File templateFile;
 
+	protected String charsetName;
+
 	/** Cached template, raw bytes. */
 	protected byte[] html_raw_bytes = null;
 
@@ -39,8 +41,9 @@ public class TemplateFileStorage implements TemplateStorage {
 	/** Cached template, raw file converted into separate HTML/XML elements. */
 	protected List<HtmlItem> html_items_cached = null;
 
-	public TemplateFileStorage(File templateFile) {
+	public TemplateFileStorage(File templateFile, String charsetName) {
 		this.templateFile = templateFile;
+		this.charsetName = charsetName;
 		checkReload();
 	}
 
@@ -68,7 +71,7 @@ public class TemplateFileStorage implements TemplateStorage {
 					last_file_length = templateFile.length();
 
 					is = new ByteArrayInputStream( html_raw_bytes );
-					reader = new InputStreamReader( is, "UTF-8" );
+					reader = new InputStreamReader( is, charsetName );
 
 					// Parse html into a List of html items.
 					HtmlParser htmlParser = new HtmlParser();
