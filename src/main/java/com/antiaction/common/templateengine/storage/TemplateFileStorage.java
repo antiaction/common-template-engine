@@ -60,6 +60,9 @@ public class TemplateFileStorage implements TemplateStorage {
 		InputStreamReader reader = null;
 		try {
 			if ( templateFile.exists() && templateFile.isFile() ) {
+				// debug
+				//System.out.println( last_modified - templateFile.lastModified() );
+				//System.out.println( last_file_length - templateFile.length() );
 				if ( last_modified != templateFile.lastModified() || last_file_length != templateFile.length() ) {
 					ram = new RandomAccessFile( templateFile, "r" );
 					html_raw_bytes = new byte[ (int)ram.length() ];

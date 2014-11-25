@@ -23,11 +23,21 @@ public class TemplatePartPlaceHolder extends TemplatePartBase {
 	private byte[] bytes = "".getBytes();
 
 	private TemplatePartPlaceHolder() {
+		type = TP_PLACEHOLDER;
 	}
 
 	public static TemplatePartPlaceHolder getInstance(HtmlItem htmlItem) {
 		TemplatePartPlaceHolder part = new TemplatePartPlaceHolder();
 		part.htmlItem = htmlItem;
+		return part;
+	}
+
+	@Override
+	public Object clone() {
+		TemplatePartPlaceHolder part = new TemplatePartPlaceHolder();
+		part.htmlItem = (HtmlItem)htmlItem.clone();
+		part.text = text;
+		part.bytes = bytes;
 		return part;
 	}
 

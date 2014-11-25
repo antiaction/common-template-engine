@@ -9,8 +9,6 @@ package com.antiaction.common.templateengine;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,32 +25,9 @@ import com.antiaction.common.templateengine.storage.TemplateStorageManager;
 @RunWith(JUnit4.class)
 public class TestTemplate {
 
-	public static String getUrlPath(URL url) {
-		String path = url.getFile();
-		path = path.replaceAll("%5b", "[");
-		path = path.replaceAll("%5d", "]");
-		return path;
-	}
-
-	public static void saveBytes(File file, byte[] bytes) throws IOException {
-		if ( file.exists() ) {
-			if ( !file.delete() ) {
-				Assert.fail( "Unable to delete file!" );
-			}
-		}
-		RandomAccessFile raf = new RandomAccessFile( file, "rw" );
-		raf.seek( 0L );
-		raf.setLength( 0L );
-		raf.write( bytes );
-		raf.close();
-	}
-
 	@Test
 	public void test_template() {
-		URL url;
-		File file;
-		url = this.getClass().getClassLoader().getResource("");
-		file = new File(getUrlPath(url));
+		File file = TestUtils.getTestResourceFile("");
 
 		TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
 		TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
@@ -83,10 +58,7 @@ public class TestTemplate {
 
 	@Test
 	public void test_template_master() {
-		URL url;
-		File file;
-		url = this.getClass().getClassLoader().getResource("");
-		file = new File(getUrlPath(url));
+		File file = TestUtils.getTestResourceFile("");
 
 		try {
 			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
@@ -129,10 +101,10 @@ public class TestTemplate {
 			File child1bFile = new File( file, "child1bfile.html" );
 			File child2aFile = new File( file, "child2afile.html" );
 
-			saveBytes( masterFile, master.getBytes() );
-			saveBytes( child1aFile, child1a.getBytes() );
-			saveBytes( child1bFile, child1b.getBytes() );
-			saveBytes( child2aFile, child2a.getBytes() );
+			TestUtils.saveBytes( masterFile, master.getBytes() );
+			TestUtils.saveBytes( child1aFile, child1a.getBytes() );
+			TestUtils.saveBytes( child1bFile, child1b.getBytes() );
+			TestUtils.saveBytes( child2aFile, child2a.getBytes() );
 
 			Template master_tpl = tplMaster.getTemplate( "masterfile.html" );
 			Template child1a_tpl = tplMaster.getTemplate( "child1afile.html" );
@@ -181,10 +153,7 @@ public class TestTemplate {
 
 	@Test
 	public void test_template_prepare() {
-		URL url;
-		File file;
-		url = this.getClass().getClassLoader().getResource("");
-		file = new File(getUrlPath(url));
+		File file = TestUtils.getTestResourceFile("");
 
 		try {
 			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
@@ -238,7 +207,7 @@ public class TestTemplate {
 			template += "<placeholder id=\"ph3\" />";
 
 			templateFile = new File( file, "templatepreparefile.html" );
-			saveBytes( templateFile, template.getBytes() );
+			TestUtils.saveBytes( templateFile, template.getBytes() );
 
 			template_tpl = tplMaster.getTemplate( "templatepreparefile.html" );
 
@@ -314,7 +283,7 @@ public class TestTemplate {
 			template += "</html>";
 
 			templateFile = new File( file, "templatepreparefile.html" );
-			saveBytes( templateFile, template.getBytes() );
+			TestUtils.saveBytes( templateFile, template.getBytes() );
 
 			template_tpl = tplMaster.getTemplate( "templatepreparefile.html" );
 

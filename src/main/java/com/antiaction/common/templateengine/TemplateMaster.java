@@ -115,11 +115,11 @@ public class TemplateMaster {
 		}
 	}
 
-	public TemplatePreprocessor getTemplatePreprocessor(String templateFileStr, Map<String, Set<String>> keepers) throws IOException {
+	public TemplatePreprocessor getTemplatePreprocessor(String templateFileStr, Map<String, Set<String>> tagIdNameMap, String character_encoding) throws IOException {
 		Template tpl = getTemplate( templateFileStr );
 		TemplatePreprocessor tplPp = null;
 		if ( tpl != null ) {
-			tplPp = TemplatePreprocessor.getInstance( tpl, keepers );
+			tplPp = TemplatePreprocessor.getInstance( tpl, tagIdNameMap, character_encoding );
 		}
 		return tplPp;
 	}

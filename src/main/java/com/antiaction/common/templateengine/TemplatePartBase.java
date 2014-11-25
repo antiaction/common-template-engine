@@ -11,6 +11,11 @@ import com.antiaction.common.html.HtmlItem;
 
 public abstract class TemplatePartBase {
 
+	public static final int TP_STATIC = 1;
+	public static final int TP_I18N = 2;
+	public static final int TP_PLACEHOLDER = 3;
+	public static final int TP_TAG = 4;
+
 	public static TemplatePartStatic getTemplatePartStatic(String text) {
 		return TemplatePartStatic.getInstance( text );
 	}
@@ -31,7 +36,12 @@ public abstract class TemplatePartBase {
 		return TemplatePartTag.getInstance( htmlItem );
 	}
 
+	public int type;
+
 	public HtmlItem htmlItem = null;
+
+	@Override
+	public abstract Object clone();
 
 	public abstract String getText();
 

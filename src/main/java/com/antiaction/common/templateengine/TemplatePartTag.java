@@ -21,11 +21,19 @@ public class TemplatePartTag extends TemplatePartBase {
 	private static Logger logger = Logger.getLogger( TemplatePartTag.class.getName() );
 
 	private TemplatePartTag() {
+		type = TP_TAG;
 	}
 
 	public static TemplatePartTag getInstance(HtmlItem htmlItem) {
 		TemplatePartTag part = new TemplatePartTag();
 		part.htmlItem = htmlItem;
+		return part;
+	}
+
+	@Override
+	public Object clone() {
+		TemplatePartTag part = new TemplatePartTag();
+		part.htmlItem = (HtmlItem)htmlItem.clone();
 		return part;
 	}
 

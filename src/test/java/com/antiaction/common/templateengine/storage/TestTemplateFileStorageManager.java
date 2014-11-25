@@ -8,29 +8,20 @@
 package com.antiaction.common.templateengine.storage;
 
 import java.io.File;
-import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.antiaction.common.templateengine.TestUtils;
+
 @RunWith(JUnit4.class)
 public class TestTemplateFileStorageManager {
 
-	public String getUrlPath(URL url) {
-		String path = url.getFile();
-		path = path.replaceAll("%5b", "[");
-		path = path.replaceAll("%5d", "]");
-		return path;
-	}
-
 	@Test
 	public void test_templatefilestoragemanager() {
-		URL url;
-		File file;
-		url = this.getClass().getClassLoader().getResource("dir1/template1.html");
-		file = new File(getUrlPath(url)).getParentFile().getParentFile();
+		File file = TestUtils.getTestResourceFile("");
 
 		String dir1 = new File( file, "dir1" ).getPath();
 		String dir2 = new File( file, "dir2" ).getPath();

@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.URL;
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,16 +19,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import com.antiaction.common.html.HtmlItem;
+import com.antiaction.common.templateengine.TestUtils;
 
 @RunWith(JUnit4.class)
 public class TestTemplateFileStorage {
-
-	public String getUrlPath(URL url) {
-		String path = url.getFile();
-		path = path.replaceAll("%5b", "[");
-		path = path.replaceAll("%5d", "]");
-		return path;
-	}
 
 	@Test
 	public void test_templatefilestorage() {
@@ -37,13 +30,10 @@ public class TestTemplateFileStorage {
 		long last_file_length;
 		List<HtmlItem> htmlItems;
 
-		URL url;
-		File file;
-		url = this.getClass().getClassLoader().getResource("");
-		file = new File(getUrlPath(url));
+		File resourceRootFile = TestUtils.getTestResourceFile("");
 
 		try {
-			File templateFile = new File( file.getParent(), "temp.html" );
+			File templateFile = new File( resourceRootFile.getParent(), "temp.html" );
 			if ( templateFile.exists() ) {
 				if ( !templateFile.delete() ) {
 					Assert.fail( "Unable to delete file!" );
@@ -95,7 +85,9 @@ public class TestTemplateFileStorage {
 			raf.write( "templatefile new".getBytes() );
 			raf.close();
 
-			// TODO periodic failures
+			// Last modified on disk is not as accurate.
+			templateFile.setLastModified( templateFile.lastModified() + 1000 );
+
 			Assert.assertTrue( tplStor.checkReload() );
 
 			Assert.assertTrue( tplStor.exists() );

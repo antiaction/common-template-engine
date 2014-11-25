@@ -25,6 +25,7 @@ public class TemplatePartI18N extends TemplatePartBase {
 	private byte[] bytes = "".getBytes();
 
 	private TemplatePartI18N() {
+		type = TP_I18N;
 	}
 
 	public static TemplatePartI18N getInstance(HtmlItem htmlItem) {
@@ -41,6 +42,16 @@ public class TemplatePartI18N extends TemplatePartBase {
 				logger.log( Level.SEVERE, e.toString(), e );
 			}
 		}
+		return part;
+	}
+
+	@Override
+	public Object clone() {
+		TemplatePartI18N part = new TemplatePartI18N();
+		part.htmlItem = (HtmlItem)htmlItem.clone();
+		part.text_id = text_id;
+		part.text = text;
+		part.bytes = bytes;
 		return part;
 	}
 

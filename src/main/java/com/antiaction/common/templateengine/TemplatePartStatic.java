@@ -21,6 +21,7 @@ public class TemplatePartStatic extends TemplatePartBase {
 	private byte[] bytes = "".getBytes();
 
 	private TemplatePartStatic() {
+		type = TP_STATIC;
 	}
 
 	public static TemplatePartStatic getInstance(String text) {
@@ -33,6 +34,14 @@ public class TemplatePartStatic extends TemplatePartBase {
 	public static TemplatePartStatic getInstance(byte[] bytes) {
 		TemplatePartStatic part = new TemplatePartStatic();
 		part.text = null;
+		part.bytes = bytes;
+		return part;
+	}
+
+	@Override
+	public Object clone() {
+		TemplatePartStatic part = new TemplatePartStatic();
+		part.text = text;
 		part.bytes = bytes;
 		return part;
 	}

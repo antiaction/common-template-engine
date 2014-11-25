@@ -10,6 +10,9 @@ package com.antiaction.common.templateengine;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +29,18 @@ public class TemplatePreprocessor {
 	/** Backing template. */
 	protected Template template;
 
-	protected Map<String, Set<String>> keepers;
+	protected Map<String, Set<String>> tagIdNameMap;
+
+	protected String character_encoding;
+
+	protected List<TemplatePartBase> templatePartsList = new ArrayList<TemplatePartBase>();
+
+	protected Set<String> i18nTextIdSet = new HashSet<String>();
+
+	protected Set<String> placeHolderIdSet = new HashSet<String>();
+
+	/** Last time this template was changed. */
+	protected long last_processed;
 
 	/**
 	 * Prevent external construction.
@@ -34,10 +48,14 @@ public class TemplatePreprocessor {
 	protected TemplatePreprocessor() {
 	}
 
-	public static TemplatePreprocessor getInstance(Template template, Map<String, Set<String>> keepers) throws IOException {
+	public static TemplatePreprocessor getInstance(Template template, Map<String, Set<String>> tagIdNameMap, String character_encoding) throws IOException {
 		TemplatePreprocessor tplPp = new TemplatePreprocessor();
 		tplPp.template = template;
-		tplPp.keepers = keepers;
+		if ( tagIdNameMap == null ) {
+			tagIdNameMap = new HashMap<String, Set<String>>();
+		}
+		tplPp.tagIdNameMap = tagIdNameMap;
+		tplPp.character_encoding = character_encoding;
 		tplPp.reload();
 		return tplPp;
 	}
@@ -48,34 +66,30 @@ public class TemplatePreprocessor {
 
 	public synchronized boolean check_reload() throws IOException {
 		boolean reloaded = template.check_reload();
-		if ( reloaded ) {
+		if ( reloaded || template.last_processed > last_processed ) {
 			reload();
 		}
 		return reloaded;
 	}
 
-	public void reload() throws IOException {
+	protected void reload() throws IOException {
 		List<HtmlItem> html_items_work = template.getHtmlItems();
+		templatePartsList.clear();
+		i18nTextIdSet.clear();
+		placeHolderIdSet.clear();
+		last_processed = System.currentTimeMillis();
 
-		TemplateParts templateParts = new TemplateParts();
-
-		List<TemplatePlaceBase> placeHolders = null;
-		String character_encoding = "UTF-8";
-
+		HtmlItem htmlItem;
 		String tagName;
 		String id;
 		String name;
 		String text_id;
+		TemplatePartBase templatePart;
+		Set<String> idNameSet;
 
-		Boolean b;
 		Boolean f;
-
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		out.reset();
-
-		HtmlItem htmlItem;
-		TemplatePlaceBase templatePlace;
-		TemplatePartBase templatePart;
 
 		if ( html_items_work != null ) {
 			int i = 0;
@@ -97,7 +111,6 @@ public class TemplatePreprocessor {
 					id = htmlItem.getAttribute( "id" );
 					name = htmlItem.getAttribute( "name" );
 
-					templatePlace = null;
 					templatePart = null;
 					f = false;
 
@@ -105,60 +118,33 @@ public class TemplatePreprocessor {
 						text_id = htmlItem.getAttribute( "text_id" );
 						if ( text_id != null && text_id.length() > 0 ) {
 							templatePart = TemplatePartBase.getTemplatePartI18N( (HtmlItem)htmlItem.clone() );
-							templateParts.i18nList.add( (TemplatePartI18N)templatePart );
+ 							i18nTextIdSet.add( text_id );
 						}
 						f = true;
 					}
 					else if ( "placeholder".compareTo( tagName ) == 0 ) {
 						if ( id != null && id.length() > 0 ) {
 							templatePart = TemplatePartBase.getTemplatePartPlaceHolder( (HtmlItem)htmlItem.clone() );
-							templateParts.placeHoldersMap.put( id, (TemplatePartPlaceHolder)templatePart );
+							placeHolderIdSet.add( id );
 						}
 						f = true;
 					}
 					if ( id != null || name != null ) {
-						int j = 0;
-						b = true;
-						while ( b ) {
-							if ( j < placeHolders.size() ) {
-								templatePlace = placeHolders.get( j );
-								switch ( templatePlace.type ) {
-								case TemplatePlaceBase.PH_TAG:
-									if ( templatePlace.tagName.compareTo( tagName ) == 0 ) {
-										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
-											templatePart = TemplatePartBase.getTemplatePartTag( (HtmlItem)htmlItem.clone() );
-											templatePlace.templatePart = templatePart;
-											templatePlace.htmlItem = templatePart.htmlItem;
-											b = false;
-											f = true;
-										}
-									}
-									break;
-								case TemplatePlaceBase.PH_PLACEHOLDER:
-									if ( "placeholder".compareTo( tagName ) == 0 ) {
-										if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
-											templatePlace.templatePart = templatePart;
-											templatePlace.htmlItem = templatePart.htmlItem;
-											b = false;
-											f = true;
-										}
-									}
-									break;
-								}
+						idNameSet = tagIdNameMap.get( tagName );
+						if (idNameSet != null) {
+							if ( (idNameSet.size() == 0) || ( id != null && idNameSet.contains( id )) || (name != null && idNameSet.contains( name )) ) {
+								templatePart = TemplatePartBase.getTemplatePartTag( (HtmlItem)htmlItem.clone() );
+								f = true;
 							}
-							else {
-								b = false;
-							}
-							++j;
 						}
 					}
 					if ( f ) {
 						if ( out.size() > 0 ) {
-							templateParts.parts.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
+							templatePartsList.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
 							out.reset();
 						}
 						if ( templatePart != null ) {
-							templateParts.parts.add( templatePart );
+							templatePartsList.add( templatePart );
 						}
 					}
 					else {
@@ -169,12 +155,96 @@ public class TemplatePreprocessor {
 				++i;
 			}
 			if ( out.size() > 0 ) {
-				templateParts.parts.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
+				templatePartsList.add( TemplatePartBase.getTemplatePartStatic( out.toByteArray() ) );
 				out.reset();
 			}
 		}
 		else {
 		}
+	}
+
+	public synchronized TemplateParts filterTemplate(List<TemplatePlaceBase> placeHolders) throws UnsupportedEncodingException, IOException {
+		check_reload();
+		TemplateParts templateParts = new TemplateParts();
+		TemplatePartBase templatePartBase;
+		TemplatePartBase templatePartBaseNew;
+		HtmlItem htmlItem;
+		String tagName;
+		String id;
+		String name;
+		int j;
+		boolean b;
+		TemplatePlaceBase templatePlace;
+		for ( int i=0; i<templatePartsList.size(); ++i ) {
+			templatePartBase = templatePartsList.get( i );
+			switch ( templatePartBase.type ) {
+			case TemplatePartBase.TP_STATIC:
+				templateParts.parts.add( templatePartBase );
+				break;
+			case TemplatePartBase.TP_I18N:
+				templatePartBaseNew = (TemplatePartBase)templatePartBase.clone();
+				templateParts.parts.add( templatePartBaseNew );
+				templateParts.i18nList.add( (TemplatePartI18N)templatePartBaseNew );
+				break;
+			case TemplatePartBase.TP_PLACEHOLDER:
+				templatePartBaseNew = (TemplatePartBase)templatePartBase.clone();
+				templateParts.parts.add( templatePartBaseNew );
+				htmlItem = templatePartBaseNew.htmlItem;
+				tagName = htmlItem.getTagname().toLowerCase();
+				id = htmlItem.getAttribute( "id" );
+				name = htmlItem.getAttribute( "name" );
+				j = 0;
+				b = true;
+				while ( b ) {
+					if ( j < placeHolders.size() ) {
+						templatePlace = placeHolders.get( j );
+						if ( templatePlace.type == TemplatePlaceBase.PH_PLACEHOLDER ) {
+							if ( "placeholder".compareTo( tagName ) == 0 ) {
+								if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
+									templatePlace.templatePart = templatePartBaseNew;
+									templatePlace.htmlItem = templatePartBaseNew.htmlItem;
+									b = false;
+								}
+							}
+						}
+					}
+					else {
+						b = false;
+					}
+					++j;
+				}
+				break;
+			case TemplatePartBase.TP_TAG:
+				templatePartBaseNew = (TemplatePartBase)templatePartBase.clone();
+				templateParts.parts.add( templatePartBaseNew );
+				htmlItem = templatePartBaseNew.htmlItem;
+				tagName = htmlItem.getTagname().toLowerCase();
+				id = htmlItem.getAttribute( "id" );
+				name = htmlItem.getAttribute( "name" );
+				j = 0;
+				b = true;
+				while ( b ) {
+					if ( j < placeHolders.size() ) {
+						templatePlace = placeHolders.get( j );
+						if ( templatePlace.type == TemplatePlaceBase.PH_TAG ) {
+							if ( templatePlace.tagName.compareTo( tagName ) == 0 ) {
+								if ( ( id != null && templatePlace.idName.compareTo( id ) == 0) || (name != null && templatePlace.idName.compareTo( name ) == 0 ) ) {
+									templatePlace.templatePart = templatePartBaseNew;
+									templatePlace.htmlItem = templatePartBaseNew.htmlItem;
+									b = false;
+								}
+							}
+						}
+					}
+					else {
+						b = false;
+					}
+					++j;
+				}
+				break;
+			}
+		}
+		return templateParts;
 	}
 
 }
