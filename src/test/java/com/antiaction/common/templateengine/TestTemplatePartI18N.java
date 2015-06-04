@@ -24,10 +24,8 @@ public class TestTemplatePartI18N {
 	public void test_templateparti18n() {
 		HtmlItem htmlItem;
 		TemplatePartI18N templatePart = null;
-
-		htmlItem = new HtmlTag( "i18n" );
-		htmlItem.setAttribute( "text_id", "42" );
-		htmlItem.setClosed( true );
+		TemplatePartI18N templatePart2 = null;
+		TemplatePartI18N templatePart3 = null;
 
 		try {
 			/*
@@ -38,11 +36,20 @@ public class TestTemplatePartI18N {
 			htmlItem.setClosed( true );
 
 			templatePart = TemplatePartBase.getTemplatePartI18N( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartI18N( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "42", templatePart.getText() );
 			Assert.assertArrayEquals( "42".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartI18N)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "42", templatePart3.getText() );
+			Assert.assertArrayEquals( "42".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -51,11 +58,20 @@ public class TestTemplatePartI18N {
 			htmlItem.setClosed( false );
 
 			templatePart = TemplatePartBase.getTemplatePartI18N( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartI18N( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "42", templatePart.getText() );
 			Assert.assertArrayEquals( "42".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartI18N)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "42", templatePart3.getText() );
+			Assert.assertArrayEquals( "42".getBytes( "UTF-8" ), templatePart3.getBytes() );
 		}
 		catch (UnsupportedEncodingException e) {
 			Assert.fail( "Unexpected exception!" );

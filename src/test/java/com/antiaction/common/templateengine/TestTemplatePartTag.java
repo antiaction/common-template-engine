@@ -24,6 +24,8 @@ public class TestTemplatePartTag {
 	public void test_templateparttag() {
 		HtmlItem htmlItem;
 		TemplatePartTag templatePart = null;
+		TemplatePartTag templatePart2 = null;
+		TemplatePartTag templatePart3 = null;
 
 		try {
 			/*
@@ -32,11 +34,20 @@ public class TestTemplatePartTag {
 			htmlItem = new HtmlTag("tag");
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag>", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag>".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag>", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag>".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -44,11 +55,20 @@ public class TestTemplatePartTag {
 			htmlItem.setAttribute("attr1", null);
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag attr1>", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag attr1>".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag attr1>", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag attr1>".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -56,11 +76,20 @@ public class TestTemplatePartTag {
 			htmlItem.setAttribute("attr1", "value1");
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag attr1=\"value1\">", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag attr1=\"value1\">".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag attr1=\"value1\">", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag attr1=\"value1\">".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -68,11 +97,20 @@ public class TestTemplatePartTag {
 			htmlItem.setClosed( true );
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag />", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag />".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag />", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag />".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -81,11 +119,20 @@ public class TestTemplatePartTag {
 			htmlItem.setClosed( true );
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag attr1 />", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag attr1 />".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag attr1 />", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag attr1 />".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -94,11 +141,20 @@ public class TestTemplatePartTag {
 			htmlItem.setClosed( true );
 
 			templatePart = TemplatePartBase.getTemplatePartTag( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartTag( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "<tag attr1=\"value1\" />", templatePart.getText() );
 			Assert.assertArrayEquals( "<tag attr1=\"value1\" />".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartTag)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "<tag attr1=\"value1\" />", templatePart3.getText() );
+			Assert.assertArrayEquals( "<tag attr1=\"value1\" />".getBytes( "UTF-8" ), templatePart3.getBytes() );
 		}
 		catch (UnsupportedEncodingException e) {
 			Assert.fail( "Unexpected exception!" );

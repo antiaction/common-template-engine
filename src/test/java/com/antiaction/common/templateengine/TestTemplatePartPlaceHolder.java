@@ -24,6 +24,8 @@ public class TestTemplatePartPlaceHolder {
 	public void test_templatepartplaceholder() {
 		HtmlItem htmlItem;
 		TemplatePartPlaceHolder templatePart;
+		TemplatePartPlaceHolder templatePart2;
+		TemplatePartPlaceHolder templatePart3;
 
 		try {
 			/*
@@ -34,21 +36,44 @@ public class TestTemplatePartPlaceHolder {
 			htmlItem.setClosed( true );
 
 			templatePart = TemplatePartBase.getTemplatePartPlaceHolder( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartPlaceHolder( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "", templatePart.getText() );
 			Assert.assertArrayEquals( "".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "", templatePart3.getText() );
+			Assert.assertArrayEquals( "".getBytes( "UTF-8" ), templatePart3.getBytes() );
 
 			templatePart.setText( "template text" );
 
 			Assert.assertEquals( "template text", templatePart.getText() );
 			Assert.assertArrayEquals( "template text".getBytes( "UTF-8" ), templatePart.getBytes() );
 
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "template text", templatePart3.getText() );
+			Assert.assertArrayEquals( "template text".getBytes( "UTF-8" ), templatePart3.getBytes() );
+
 			templatePart.setBytes( "text template".getBytes() );
 
 			Assert.assertEquals( "text template", templatePart.getText() );
 			Assert.assertArrayEquals( "text template".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "text template", templatePart3.getText() );
+			Assert.assertArrayEquals( "text template".getBytes( "UTF-8" ), templatePart3.getBytes() );
 			/*
 			 * 
 			 */
@@ -57,21 +82,44 @@ public class TestTemplatePartPlaceHolder {
 			htmlItem.setClosed( false );
 
 			templatePart = TemplatePartBase.getTemplatePartPlaceHolder( htmlItem );
+			templatePart2 = TemplatePartBase.getTemplatePartPlaceHolder( htmlItem );
+			Assert.assertTrue( templatePart.htmlItem == templatePart2.htmlItem );
 			Assert.assertNotNull( templatePart );
-			Assert.assertEquals( htmlItem, templatePart.htmlItem );
+			Assert.assertTrue( htmlItem == templatePart.htmlItem );
 
 			Assert.assertEquals( "", templatePart.getText() );
 			Assert.assertArrayEquals( "".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "", templatePart3.getText() );
+			Assert.assertArrayEquals( "".getBytes( "UTF-8" ), templatePart3.getBytes() );
 
 			templatePart.setText( "template text" );
 
 			Assert.assertEquals( "template text", templatePart.getText() );
 			Assert.assertArrayEquals( "template text".getBytes( "UTF-8" ), templatePart.getBytes() );
 
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "template text", templatePart3.getText() );
+			Assert.assertArrayEquals( "template text".getBytes( "UTF-8" ), templatePart3.getBytes() );
+
 			templatePart.setBytes( "text template".getBytes() );
 
 			Assert.assertEquals( "text template", templatePart.getText() );
 			Assert.assertArrayEquals( "text template".getBytes( "UTF-8" ), templatePart.getBytes() );
+
+			templatePart3 = (TemplatePartPlaceHolder)templatePart.clone();
+			Assert.assertFalse( templatePart3.htmlItem == templatePart.htmlItem );
+			Assert.assertFalse( htmlItem == templatePart3.htmlItem );
+
+			Assert.assertEquals( "text template", templatePart3.getText() );
+			Assert.assertArrayEquals( "text template".getBytes( "UTF-8" ), templatePart3.getBytes() );
 		}
 		catch (UnsupportedOperationException e) {
 			e.printStackTrace();
