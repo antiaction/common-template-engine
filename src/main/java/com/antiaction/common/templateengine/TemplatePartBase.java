@@ -40,8 +40,14 @@ public abstract class TemplatePartBase {
 
 	public HtmlItem htmlItem = null;
 
+	public String id;
+
 	@Override
 	public abstract Object clone();
+
+	public String getId() {
+		return id;
+	}
 
 	public abstract String getText();
 

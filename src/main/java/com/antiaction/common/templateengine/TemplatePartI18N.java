@@ -56,6 +56,11 @@ public class TemplatePartI18N extends TemplatePartBase {
 	}
 
 	@Override
+	public String getId() {
+		return text_id;
+	}
+
+	@Override
 	public String getText() {
 		return text;
 	}

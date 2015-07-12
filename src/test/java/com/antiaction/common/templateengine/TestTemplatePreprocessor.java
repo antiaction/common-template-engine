@@ -10,6 +10,7 @@ package com.antiaction.common.templateengine;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -180,12 +181,18 @@ public class TestTemplatePreprocessor {
 			Assert.assertTrue( child1b_tplPp.check_reload() );
 			Assert.assertFalse( child1a_tplPp.check_reload() );
 			Assert.assertFalse( master_tplPp.check_reload() );
+
+			List<TemplatePartBase> parts = child2a_tplPp.templatePartsList;
+			System.out.println(parts);
+			for ( int i=0; i<parts.size(); ++i ) {
+				System.out.println( parts.get( i ).getId() );
+				System.out.println( parts.get( i ).getText() );
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail( "Unexpected exception!" );
 		}
 	}
-
 
 }

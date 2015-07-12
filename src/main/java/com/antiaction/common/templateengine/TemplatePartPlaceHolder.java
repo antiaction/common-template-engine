@@ -29,6 +29,7 @@ public class TemplatePartPlaceHolder extends TemplatePartBase {
 	public static TemplatePartPlaceHolder getInstance(HtmlItem htmlItem) {
 		TemplatePartPlaceHolder part = new TemplatePartPlaceHolder();
 		part.htmlItem = htmlItem;
+		part.id = htmlItem.getAttribute( "id" );
 		return part;
 	}
 
@@ -36,6 +37,7 @@ public class TemplatePartPlaceHolder extends TemplatePartBase {
 	public Object clone() {
 		TemplatePartPlaceHolder part = new TemplatePartPlaceHolder();
 		part.htmlItem = (HtmlItem)htmlItem.clone();
+		part.id = id;
 		part.text = text;
 		part.bytes = bytes;
 		return part;
