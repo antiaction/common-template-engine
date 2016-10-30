@@ -10,7 +10,9 @@ package com.antiaction.common.templateengine;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -182,12 +184,63 @@ public class TestTemplatePreprocessor {
 			Assert.assertFalse( child1a_tplPp.check_reload() );
 			Assert.assertFalse( master_tplPp.check_reload() );
 
-			List<TemplatePartBase> parts = child2a_tplPp.templatePartsList;
+			List<TemplatePartBase> parts = master_tplPp.templatePartsList;
 			System.out.println(parts);
 			for ( int i=0; i<parts.size(); ++i ) {
-				System.out.println( parts.get( i ).getId() );
-				System.out.println( parts.get( i ).getText() );
+				System.out.println( "type: " + parts.get( i ).type );
+				System.out.println( "  id: " + parts.get( i ).getId() );
+				System.out.println( "text: " + parts.get( i ).getText() );
 			}
+
+			parts = child1a_tplPp.templatePartsList;
+			System.out.println(parts);
+			for ( int i=0; i<parts.size(); ++i ) {
+				System.out.println( "type: " + parts.get( i ).type );
+				System.out.println( "  id: " + parts.get( i ).getId() );
+				System.out.println( "text: " + parts.get( i ).getText() );
+			}
+
+			parts = child1b_tplPp.templatePartsList;
+			System.out.println(parts);
+			for ( int i=0; i<parts.size(); ++i ) {
+				System.out.println( "type: " + parts.get( i ).type );
+				System.out.println( "  id: " + parts.get( i ).getId() );
+				System.out.println( "text: " + parts.get( i ).getText() );
+			}
+
+			parts = child2a_tplPp.templatePartsList;
+			System.out.println(parts);
+			for ( int i=0; i<parts.size(); ++i ) {
+				System.out.println( "type: " + parts.get( i ).type );
+				System.out.println( "  id: " + parts.get( i ).getId() );
+				System.out.println( "text: " + parts.get( i ).getText() );
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail( "Unexpected exception!" );
+		}
+	}
+
+	@Test
+	public void test_templatepreprocessor_login() {
+		File file = TestUtils.getTestResourceFile("");
+
+		try {
+			TemplateStorageManager tplStorMan = TemplateFileStorageManager.getInstance( file.getPath(), "UTF-8" );
+			TemplateMaster tplMaster = TemplateMaster.getInstance( "default" );
+			tplMaster.addTemplateStorage( tplStorMan );
+
+			Map<String, Set<String>> tagIdNameMap = new HashMap<String, Set<String>>();
+			Set<String> set = new HashSet<String>();
+			set.add("login_user");
+			set.add("login_pass");
+			tagIdNameMap.put("input", set);
+
+			TemplatePreprocessor tplPp = tplMaster.getTemplatePreprocessor( "login.html", tagIdNameMap, "UTF-8" );
+			Assert.assertNotNull(tplPp);
+
+			//tplPp
 		}
 		catch (IOException e) {
 			e.printStackTrace();

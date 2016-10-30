@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="vs_defaultClientScript" content="JavaScript">
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
+		<meta name="description" content="raptor">
+		<meta name="keywords" content="raptor">
+		<meta name="author" content="login@antiaction.com">
+		<meta name="robots" content="noindex,nofollow">
+		<title>Login</title>
+		<link rel="stylesheet" type="text/css" href="/default.css" />
+		<style type="text/css">
+<!--
+table.outer {
+	width: 100%;
+}
+<placeholder id="css" />
+
+  -->
+		</style>
+		<script type="text/javascript">
+<!--
+function initfocus() {
+	document.login_form.login_user.style.backgroundColor = '#ffffff';
+	document.login_form.login_pass.style.backgroundColor = '#ffffff';
+
+	if ( document.login_form.login_user.value.length == 0 ) {
+		document.login_form.login_user.style.backgroundColor = '#f0f0f0';
+		document.login_form.login_user.focus();
+	}
+	else {
+		document.login_form.login_pass.style.backgroundColor = '#f0f0f0';
+		document.login_form.login_pass.focus();
+	}
+}
+
+<placeholder id="js" />
+
+function focused(obj) {
+	obj.style.backgroundColor = '#f0f0f0';
+}
+
+function unfocused(obj) {
+	obj.style.backgroundColor = '#ffffff';
+}
+
+function init() {
+	if ( document.parentWindow != document.parentWindow.top  ) {
+		top.location = top.location;
+	}
+	initfocus();
+}
+// -->
+		</script>
+	</head>
+	<body onLoad="init();">
+		<placeholder id="content" />
+		<form action="?action=login" name="login_form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+			<input type="hidden" name="login_tourl" value="">
+			<table class="outer">
+				<tr class="outer">
+					<td class="outer">
+						<h1>Login</h1>
+						<hr size="1" noshade="1" />
+						<table class="inner">
+							<tr>
+								<td colspan="2"><img src="/wb_12k.gif" alt="wb1.2"></td>
+								<placeholder id="input" />
+							</tr>
+							<tr>
+								<td class="login_text">Login/Email:</td>
+								<td class="login_input"><input class="login" type="text" name="login_user" value="" size="32" onFocus="focused(this);" onBlur="unfocused(this);"></td>
+							</tr>
+							<tr>
+								<td class="login_text">Password:</td>
+								<td class="login_input"><input class="login" type="password" name="login_pass" value="" size="16" onFocus="focused(this);" onBlur="unfocused(this);"></td>
+							</tr>
+							<tr>
+								<td class="login_text">&nbsp;</td>
+								<td class="login_input"><input class="chkbox" type="checkbox" name="login_rememberme"><span class="middle">Remember me</span></td>
+							</tr>
+							<tr>
+								<td class="login_text">&nbsp;</td>
+								<td class="login_input"><input type="submit" name="sbmt" value="Login"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>
