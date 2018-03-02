@@ -14,7 +14,7 @@ public class TestBasicStringReplace {
 	@Test
 	public void test_template() {
 		String[] strArray;
-		Map<String, String> env = new HashMap<String, String>();
+		Map<String, String> envMap = new HashMap<String, String>();
 		String str;
 		String separator;
 		String expected;
@@ -38,12 +38,9 @@ public class TestBasicStringReplace {
 			strArray = (String[]) testCases[i][0];
 			separator = (String) testCases[i][1];
 			expected = (String) testCases[i][2];
-			str = BasicStringReplace.untemplate(strArray, env, false, separator);
+			str = BasicStringReplace.untemplate(strArray, envMap, false, separator);
 			Assert.assertEquals(expected, str);
 		}
-
-		env.put("STR", "TemplateEngine");
-		env.put("str", "antiaction.com");
 
 		testCases = new Object[][] {
 				{"${STR}", "TemplateEngine", true, false, null},
@@ -61,14 +58,17 @@ public class TestBasicStringReplace {
 				{"Find ${StR} at ${str}", "Find  at antiaction.com", true, true, "Env is missing replacement for: StR"}
 		};
 
+		envMap.put("STR", "TemplateEngine");
+		envMap.put("str", "antiaction.com");
+
 		for (int i = 0; i < testCases.length; ++i) {
-			str = (String) testCases[i][0];
-			expected = (String) testCases[i][1];
-			bFailOnMissing = (Boolean) testCases[i][2];
-			bExceptionExpected = (Boolean) testCases[i][3];
-			expectedMessage = (String) testCases[i][4];
+			str = (String)testCases[i][0];
+			expected = (String)testCases[i][1];
+			bFailOnMissing = (Boolean)testCases[i][2];
+			bExceptionExpected = (Boolean)testCases[i][3];
+			expectedMessage = (String)testCases[i][4];
 			try {
-				str = BasicStringReplace.untemplate(str, env, bFailOnMissing);
+				str = BasicStringReplace.untemplate(str, envMap, bFailOnMissing);
 				Assert.assertEquals(expected, str);
 				Assert.assertFalse(bExceptionExpected);
 			}
